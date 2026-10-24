@@ -307,3 +307,7 @@ html, body { overflow-x: hidden; overflow-x: clip; }
 .form-msg { margin: 0; padding: 10px 14px; border: 2px solid var(--line); font-size: 15px; }
 .form-msg.ok { border-color: var(--good); }
 .form-msg.ng { border-color: var(--bad); }
+
+.about { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
+.about summary { cursor: pointer; padding: 4px 0; }
+.about p { margin: 4px 0 0; line-height: 1.8; }
