@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>お問い合わせ｜3秒即断RPG</title>
+<meta name="description" content="「3秒即断RPG」へのお問い合わせフォーム">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>html{background:#e8ebf6}@media (prefers-color-scheme:dark){html{background:#0e1124}}</style>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main class="app" data-root="../">
+  <header class="top"><a class="brand-link" href="../index.html"><h1 class="brand">3秒即断RPG<small>(仮)</small></h1></a><a class="collect" href="../index.html">遊ぶ</a></header>
+  <article class="doc">
+    <h2>お問い合わせ</h2>
+    <p>不具合のご報告、ご意見、ご要望などは、下のフォームからお送りください。内容によっては、お返事できない場合があります。ご入力いただいた内容の取り扱いは、<a href="../privacy/index.html">プライバシーポリシー</a>をご確認ください。</p>
+    <p class="form-msg" id="formMsg" hidden></p>
+    <form class="form" id="contactForm" method="POST" action="#" data-u="nightsevenlord11" data-d="gmail.com">
+      <label>お問い合わせの種類<select name="category"><option>不具合のご報告</option><option>ご意見・ご要望</option><option>広告・掲載について</option><option>その他</option></select></label>
+      <label>お名前(任意)<input type="text" name="name" maxlength="60" autocomplete="name"></label>
+      <label>メールアドレス(返信が必要な場合)<input type="email" name="email" maxlength="120" autocomplete="email"></label>
+      <label><span>お問い合わせ内容<span class="req">必須</span></span><textarea name="message" required maxlength="2000"></textarea></label>
+      <label class="hp" aria-hidden="true">この欄は、空のままにしてください<input type="text" name="_honey" tabindex="-1" autocomplete="off"></label>
+      <input type="hidden" name="_subject" value="【3秒即断RPG】お問い合わせ">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="">
+      <label class="agree"><input type="checkbox" name="agree" required><span>プライバシーポリシーに同意して送信します。</span></label>
+      <button class="btn primary" type="submit">送信する</button>
+    </form>
+    <noscript><p class="form-msg ng">このフォームの送信には、JavaScriptが必要です。</p></noscript>
+  </article>
+  <footer class="foot"><nav><a href="../privacy/index.html">プライバシーポリシー</a><a href="../contact/index.html">お問い合わせ</a></nav><small>© 2026 3秒即断RPG</small></footer>
+</main>
+<script src="../contact.js"></script>
+</body>
+</html>

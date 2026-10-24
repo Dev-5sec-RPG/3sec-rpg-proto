@@ -299,9 +299,9 @@
     const go = function () { location.replace(C.endUrl(code)); };   // 履歴に残さない(戻るでプレイの途中に戻らないため)
     if (ENDS[code].epilogue) { showEpilogue(ENDS[code].epilogue, go); return; }
     const kind = ENDS[code].kind;
-    if (kind === 'fail') document.body.classList.add('hit-fail');       // 赤い点滅(0.8秒)
+    if (kind === 'fail') document.body.classList.add('hit-fail');       // 赤い点滅(0.56秒)
     else if (kind !== 'quit') document.body.classList.add('hit-ok');
-    setTimeout(go, kind === 'quit' ? 500 : 1300);                       // 点滅(0.8秒)のあと、0.5秒置いて結果へ
+    setTimeout(go, kind === 'quit' ? 500 : 1060);                       // 点滅(0.56秒)のあと、0.5秒置いて結果へ
   }
 
   /* 勝利エンド: 長めのフェードアウト → 一文 → エンドのページへ(タップで飛ばせる) */
