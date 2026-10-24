@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>5秒即決RPG</title>
-<meta name="description" content="5秒以内に選び続ける、ステータスで結末が変わる短いRPG。">
+<title>3秒即断RPG</title>
+<meta name="description" content="3秒以内に選び続ける、ステータスで結末が変わる短いRPG。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
@@ -13,10 +13,10 @@
 </head>
 <body>
 <main class="app" data-root="./">
-  <header class="top"><h1 class="brand">5秒即決RPG<small>(仮)</small></h1><span class="collect" id="collect">収集 0/52</span></header>
+  <header class="top"><h1 class="brand">3秒即断RPG<small>(仮)</small></h1><span class="collect" id="collect">収集 0/52</span></header>
   <section class="status" id="status" aria-label="ステータス"></section>
   <ol class="pips" id="pips" aria-label="進行状況"></ol>
-  <div class="row3"><div class="gear" id="gear"><span>武器 <b id="gearW">―</b></span><span>防具 <b id="gearA">―</b></span><span>仲間 <b id="gearF">―</b></span></div><div class="purse" id="purse">所持金 <b id="purseV">0</b>銀貨</div></div>
+  <div class="row3"><div class="gear" id="gear"><div class="g-eq"><span>武器 <b id="gearW">―</b></span><span>防具 <b id="gearA">―</b></span></div><div class="g-ally"><span>仲間 <b id="gearF">―</b></span></div></div><div class="purse" id="purse">所持金 <b id="purseV">0</b>銀貨</div></div>
   <section class="stage" id="stage"></section>
 </main>
 <div class="flash" aria-hidden="true"></div>

@@ -2,7 +2,9 @@
 (function () {
   'use strict';
   const G = GAME, C = COMMON, STATS = G.STATS, ENDS = G.ENDS;
-  const LIMIT = (typeof window.__LIMIT === 'number') ? window.__LIMIT : G.TIME_LIMIT;
+  const SHOWN = G.TIME_LIMIT;                                  // 画面に出る秒数(3.0)
+  const LIMIT = (typeof window.__LIMIT === 'number') ? window.__LIMIT : G.TIME_LIMIT * G.TIME_SCALE;   // 実際の制限(3.6秒)
+  const SCALE = LIMIT / SHOWN;                                  // 表示の進みは、実時間より少しゆっくり
   let pipLabels = ['A'], pipOf = [];
   const $ = function (s) { return document.querySelector(s); };
   const stage = $('#stage'), statusEl = $('#status'), pipsEl = $('#pips');
@@ -96,9 +98,9 @@
         onExpire();
         return;
       }
-      numEl.textContent = (rem / 1000).toFixed(1);
+      numEl.textContent = (rem / SCALE / 1000).toFixed(1);
       fillEl.style.transform = 'scaleX(' + (rem / LIMIT) + ')';
-      fillEl.classList.toggle('hot', rem < 1000);
+      fillEl.classList.toggle('hot', rem / SCALE < 1000);
       t.raf = requestAnimationFrame(tick);
     }
     t.raf = requestAnimationFrame(tick);
@@ -119,7 +121,7 @@
     if (o.shuffle) shuffle(order);
     stage.innerHTML =
       '<div class="window">' + (o.who ? '<div class="plate">' + o.who + '</div>' : '') + '<p class="line">' + o.q + '</p></div>' +
-      '<div class="clock" aria-hidden="true"><div class="clock-num" id="clockNum">' + (LIMIT / 1000).toFixed(1) + '</div>' +
+      '<div class="clock" aria-hidden="true"><div class="clock-num" id="clockNum">' + (SHOWN / 1000).toFixed(1) + '</div>' +
       '<div class="clock-bar"><i id="clockFill"></i></div></div>' +
       '<div class="choices">' + order.map(function (idx, n) {
         return '<button class="btn choice" data-i="' + idx + '"><span class="key">' + (n + 1) + '</span><span class="txt">' + o.labels[idx] + '</span></button>';
@@ -161,7 +163,7 @@
     const first = step === 1;
     if (first) prefetch(candidates(card));        // 物語を読んでいる間に、行き先を読み込む
     const html =
-      '<div class="portrait" aria-hidden="true">' + (first ? '？' : '！') + '</div>' +
+      '<div class="portrait" aria-hidden="true">' + (first ? '？' : (card.icon ? C.pixelSVG(card.icon) : '！')) + '</div>' +
       '<div class="window tappable">' + (first ? '' : '<div class="plate">' + card.who + '</div>') +
       '<p class="line">' + (first ? (card.intro1 || 'あれ、あそこにいるのは…') : (card.intro2 || card.who + 'だ。何か用があるみたいだ。')) + '</p>' +
       '<span class="more" aria-hidden="true">▼</span></div>';
@@ -297,9 +299,9 @@
     const go = function () { location.replace(C.endUrl(code)); };   // 履歴に残さない(戻るでプレイの途中に戻らないため)
     if (ENDS[code].epilogue) { showEpilogue(ENDS[code].epilogue, go); return; }
     const kind = ENDS[code].kind;
-    if (kind === 'fail') document.body.classList.add('hit-fail');
+    if (kind === 'fail') document.body.classList.add('hit-fail');       // 赤い点滅(0.8秒)
     else if (kind !== 'quit') document.body.classList.add('hit-ok');
-    go();
+    setTimeout(go, kind === 'quit' ? 500 : 1300);                       // 点滅(0.8秒)のあと、0.5秒置いて結果へ
   }
 
   /* 勝利エンド: 長めのフェードアウト → 一文 → エンドのページへ(タップで飛ばせる) */

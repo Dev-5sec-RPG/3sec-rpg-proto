@@ -1,7 +1,7 @@
 /* ====== 全ページ共通(記録の保存、ページの行き先、ドット絵) ====== */
 const COMMON = (function () {
-  const KEY = 'sansec_rpg_codex_v1';   // 図鑑(到達したエンド)
-  const LAST = 'sansec_rpg_last_v1';   // 直近の結果(ステータス・履歴)
+  const KEY = 'sansec_rpg_codex_v2';   // 図鑑(到達したエンド)
+  const LAST = 'sansec_rpg_last_v2';   // 直近の結果(ステータス・履歴)
   let memCodex = {}, memLast = null;
 
   function read(key) {
