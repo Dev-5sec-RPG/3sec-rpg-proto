@@ -242,30 +242,32 @@ const GAME = (function () {
     '024': { name: '怖気づいてしまった。敗北者じゃけぇ。', text: 'ライバルに背を向けて、走り出した。\n笑い声だけが、いつまでも追いかけてきた。', reason: '逃げることを選んだ。', img: 'flag', kind: 'fail' },
     '025': { name: '俺には運がない', text: 'あいこが続いた末に、最後は負けた。\nライバルは、腹を抱えて笑っている。', reason: '運が悪かった。', img: 'coin', kind: 'fail' },
     '026': { name: 'ライバルの前で固まった', text: '何も言えないうちに、ライバルは先に行ってしまった。', reason: '3秒以内に決められなかった。', img: 'clock', kind: 'fail' },
-    '027': { name: 'オークに敗れた', text: '巨大な棍棒が、振り下ろされた。\n意識は、そこで途切れた。', reason: '戦う力が足りなかった。', img: 'axe', kind: 'fail' },
-    '028': { name: '骸骨剣士に敗れた', text: '骸骨の剣士は、疲れを知らなかった。\nこちらは、知っていた。', reason: '戦う力が足りなかった。', img: 'bone', kind: 'fail' },
-    '029': { name: 'ワイバーンに敗れた', text: '空から降ってきた影に、為す術がなかった。', reason: '戦う力が足りなかった。', img: 'horn', kind: 'fail' },
-    '030': { name: '将軍に敗れた', text: '「この程度で、魔王様に会えると思ったか」\n炎が、視界を埋め尽くした。', reason: '戦う力が足りなかった。', img: 'axe', kind: 'fail' },
-    '031': { name: '受け止めきれなかった', text: '身構えて、攻撃を受けた。\n想像より、ずっと重かった。', reason: '守りが及ばなかった。', img: 'gate', kind: 'fail' },
-    '032': { name: '迷っている間に襲われた', text: '迷っているうちに、魔物の爪が届いていた。', reason: '3秒以内に決められなかった。', img: 'clock', kind: 'fail' },
-    '033': { name: '夢の中へ', text: '目を閉じると、いつもの布団の中だった。\n全部、夢だったのかもしれない。', img: 'moon', kind: 'quit' },
-    '034': { name: '魔王には届かなかった', text: '渾身の一撃は、魔王の指一本で止められた。', reason: '魔王に通用する力がなかった。', img: 'horn', kind: 'fail' },
-    '035': { name: '仲間はいなかった', text: '「行け、仲間たちよ!」と叫んだが、後ろには誰もいなかった。\n魔王は、少し気の毒そうな顔をした。', reason: '戦わせる仲間がいなかった。', img: 'horn', kind: 'fail' },
-    '036': { name: '世間話は通じなかった', text: '「最近、いい天気ですね」\n魔王は、無表情で玉座の肘掛けを叩いた。', reason: 'その場しのぎと愛嬌が足りなかった。', img: 'horn', kind: 'fail' },
-    '037': { name: '歌は届かなかった', text: '渾身の歌は、魔王城のコウモリにだけウケた。', reason: '度胸と慎重さが足りなかった。', img: 'horn', kind: 'fail' },
-    '038': { name: 'カツアゲにも値しない', text: '「出せ」と言われたが、出せるものがなかった。\n魔王は、深いため息をついた。', reason: '所持金が足りなかった。', img: 'coin', kind: 'fail' },
-    '039': { name: '奥義は不発だった', text: '渾身の奥義を放ったが、なにも起きなかった。\n魔王は、とても丁寧に拍手してくれた。', reason: '奥義を使う条件を、満たせなかった。', img: 'horn', kind: 'fail' },
-    '040': { name: '土下座は通じなかった', text: '額を床に擦りつけたが、魔王は「それほどでもない」と言った。', reason: '土下座が通じる条件を、満たせなかった。', img: 'horn', kind: 'fail' },
-    '041': { name: '助けは来なかった', text: '「誰か、助けてくれ!」\n声は、広い魔王城に虚しく響いた。', reason: '助けを呼べる相手がいなかった。', img: 'horn', kind: 'fail' },
-    '042': { name: '魔王を前に固まった', text: '魔王を前に、何も言えず、動けなかった。\n魔王は、そっと玉座に座り直した。', reason: '3秒以内に決められなかった。', img: 'clock', kind: 'fail' },
-    '043': { name: '田舎で余生を', text: '魔王に背を向けて、故郷の村へ帰った。\n畑を耕しながら、世界の行く末をぼんやり眺めている。', img: 'house', kind: 'quit' },
-    '044': { name: '魔王の下僕', text: '土下座を気に入られ、魔王城で働くことになった。\n意外と、居心地は悪くない。', img: 'horn', kind: 'hidden' },
-    '045': { name: '装備が魔王を貫いた', text: '鍛えられた装備が、奥義を支えた。\n魔王は、光の中に消えていった。', img: 'sword', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
-    '046': { name: '己の力で魔王を倒した', text: '積み重ねた力が、奥義となって魔王を貫いた。', img: 'star', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
-    '047': { name: '仲間と共に魔王を倒した', text: '仲間と心を合わせた奥義が、魔王を打ち倒した。', img: 'star', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
-    '048': { name: '俺は最強かもしれない', text: '装備も、力も、仲間も、揃いかけていた。\n奥義は、魔王を一撃で沈めた。\n…もしかして、自分は最強かもしれない。', img: 'star', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
-    '049': { name: '俺は最強だった', text: '全てが揃っていた。\n奥義が放たれる前に、魔王は降参していた。\n自分は、最強だった。', img: 'crown', kind: 'clear', epilogue: '魔王は降参した。\n世界に、平和が訪れた。' },
-    '050': { name: '最強の旅人', text: '助けを呼ぶと、あの旅人が現れた。\n魔王は、一撃で沈んだ。\n50銀貨は、さすがに払えなかったが。', img: 'sword', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
+    '027': { name: 'ライバルに完敗した', text: '斬りかかったが、ライバルは一歩も動かなかった。\n気がつくと、地面に転がっていた。', reason: '装備が心もとなく、仲間もいなかった。', img: 'sword', kind: 'fail' },
+    '028': { name: 'ライバルの手下になった', text: '「仲間になろう」と誘ったが、「なら、俺の子分だ」と返された。\n断る間もなく、荷物持ちが決まった。', reason: '装備が貧弱だった。', img: 'flag', kind: 'fail' },
+    '029': { name: 'オークに敗れた', text: '巨大な棍棒が、振り下ろされた。\n意識は、そこで途切れた。', reason: '戦う力が足りなかった。', img: 'axe', kind: 'fail' },
+    '030': { name: '骸骨剣士に敗れた', text: '骸骨の剣士は、疲れを知らなかった。\nこちらは、知っていた。', reason: '戦う力が足りなかった。', img: 'bone', kind: 'fail' },
+    '031': { name: 'ワイバーンに敗れた', text: '空から降ってきた影に、為す術がなかった。', reason: '戦う力が足りなかった。', img: 'horn', kind: 'fail' },
+    '032': { name: '将軍に敗れた', text: '「この程度で、魔王様に会えると思ったか」\n炎が、視界を埋め尽くした。', reason: '戦う力が足りなかった。', img: 'axe', kind: 'fail' },
+    '033': { name: '受け止めきれなかった', text: '身構えて、攻撃を受けた。\n想像より、ずっと重かった。', reason: '守りが及ばなかった。', img: 'gate', kind: 'fail' },
+    '034': { name: '迷っている間に襲われた', text: '迷っているうちに、魔物の爪が届いていた。', reason: '3秒以内に決められなかった。', img: 'clock', kind: 'fail' },
+    '035': { name: '夢の中へ', text: '目を閉じると、いつもの布団の中だった。\n全部、夢だったのかもしれない。', img: 'moon', kind: 'quit' },
+    '036': { name: '魔王には届かなかった', text: '渾身の一撃は、魔王の指一本で止められた。', reason: '魔王に通用する力がなかった。', img: 'horn', kind: 'fail' },
+    '037': { name: '仲間はいなかった', text: '「行け、仲間たちよ!」と叫んだが、後ろには誰もいなかった。\n魔王は、少し気の毒そうな顔をした。', reason: '戦わせる仲間がいなかった。', img: 'horn', kind: 'fail' },
+    '038': { name: '世間話は通じなかった', text: '「最近、いい天気ですね」\n魔王は、無表情で玉座の肘掛けを叩いた。', reason: 'その場しのぎと愛嬌が足りなかった。', img: 'horn', kind: 'fail' },
+    '039': { name: '歌は届かなかった', text: '渾身の歌は、魔王城のコウモリにだけウケた。', reason: '度胸と慎重さが足りなかった。', img: 'horn', kind: 'fail' },
+    '040': { name: 'カツアゲにも値しない', text: '「出せ」と言われたが、出せるものがなかった。\n魔王は、深いため息をついた。', reason: '所持金が足りなかった。', img: 'coin', kind: 'fail' },
+    '041': { name: '奥義は不発だった', text: '渾身の奥義を放ったが、なにも起きなかった。\n魔王は、とても丁寧に拍手してくれた。', reason: '奥義を使う条件を、満たせなかった。', img: 'horn', kind: 'fail' },
+    '042': { name: '土下座は通じなかった', text: '額を床に擦りつけたが、魔王は「それほどでもない」と言った。', reason: '土下座が通じる条件を、満たせなかった。', img: 'horn', kind: 'fail' },
+    '043': { name: '助けは来なかった', text: '「誰か、助けてくれ!」\n声は、広い魔王城に虚しく響いた。', reason: '助けを呼べる相手がいなかった。', img: 'horn', kind: 'fail' },
+    '044': { name: '魔王を前に固まった', text: '魔王を前に、何も言えず、動けなかった。\n魔王は、そっと玉座に座り直した。', reason: '3秒以内に決められなかった。', img: 'clock', kind: 'fail' },
+    '045': { name: '田舎で余生を', text: '魔王に背を向けて、故郷の村へ帰った。\n畑を耕しながら、世界の行く末をぼんやり眺めている。', img: 'house', kind: 'quit' },
+    '046': { name: '魔王の下僕', text: '土下座を気に入られ、魔王城で働くことになった。\n意外と、居心地は悪くない。', img: 'horn', kind: 'hidden' },
+    '047': { name: '装備が魔王を貫いた', text: '鍛えられた装備が、奥義を支えた。\n魔王は、光の中に消えていった。', img: 'sword', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
+    '048': { name: '己の力で魔王を倒した', text: '積み重ねた力が、奥義となって魔王を貫いた。', img: 'star', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
+    '049': { name: '仲間と共に魔王を倒した', text: '仲間と心を合わせた奥義が、魔王を打ち倒した。', img: 'star', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
+    '050': { name: '俺は最強かもしれない', text: '装備も、力も、仲間も、揃いかけていた。\n奥義は、魔王を一撃で沈めた。\n…もしかして、自分は最強かもしれない。', img: 'star', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
+    '051': { name: '俺は最強だった', text: '全てが揃っていた。\n奥義が放たれる前に、魔王は降参していた。\n自分は、最強だった。', img: 'crown', kind: 'clear', epilogue: '魔王は降参した。\n世界に、平和が訪れた。' },
+    '052': { name: '最強の旅人', text: '助けを呼ぶと、あの旅人が現れた。\n魔王は、一撃で沈んだ。\n80銀貨は、さすがに払えなかったが。', img: 'sword', kind: 'clear', epilogue: '魔王は倒れた。\n世界に、平和が訪れた。' },
     '999': { name: 'お疲れ様でした。', text: 'お気をつけてお帰り下さい。', img: 'door', kind: 'quit' }
   };
 
@@ -274,9 +276,9 @@ const GAME = (function () {
     { from: '000', to: '009', extra: ['999'], name: 'はじまりの村' },
     { from: '010', to: '018', name: '関所' },
     { from: '019', to: '023', name: '街' },
-    { from: '024', to: '026', name: 'ライバル' },
-    { from: '027', to: '033', name: 'モンスター' },
-    { from: '034', to: '050', name: '魔王' }
+    { from: '024', to: '028', name: 'ライバル' },
+    { from: '029', to: '035', name: 'モンスター' },
+    { from: '036', to: '052', name: '魔王' }
   ];
 
   /* 図鑑の、未収集エンドのヒント(どこで、どんな状況か) */
@@ -309,30 +311,32 @@ const GAME = (function () {
     '024': 'ライバル。ライバルを前に、逃げ出すと。',
     '025': 'ライバル。運に任せた勝負をして、負けると。',
     '026': 'ライバル。ライバルの前で、時間が過ぎると。',
-    '027': '中級の魔物(オーク)。力が足りないまま、突破しようとすると。',
-    '028': '中級の魔物(骸骨剣士)。力が足りないまま、突破しようとすると。',
-    '029': '強級の魔物(ワイバーン)。力が足りないまま、突破しようとすると。',
-    '030': '強級の魔物(獄炎の将軍)。力が足りないまま、突破しようとすると。',
-    '031': '強級の魔物。守りに入ると。',
-    '032': '中級以上の魔物。魔物の前で、時間が過ぎると。',
-    '033': '魔物。現実から目を背けると。',
-    '034': '魔王。力が足りないまま、正面から戦うと。',
-    '035': '魔王。いないはずの仲間に、戦わせようとすると。',
-    '036': '魔王。その場しのぎと愛嬌が足りないまま、世間話をすると。',
-    '037': '魔王。度胸と慎重さが足りないまま、歌うと。',
-    '038': '魔王。所持金が足りないまま、カツアゲされると。',
-    '039': '魔王(2回目)。条件が整わないまま、奥義を使うと。',
-    '040': '魔王(2回目)。条件が合わないまま、土下座すると。',
-    '041': '魔王(2回目)。助けを呼んだが、誰も来なかった。',
-    '042': '魔王。魔王の前で、時間が過ぎると。',
-    '043': '魔王(2回目)。戦わずに、逃げ出すと。',
-    '044': '魔王(2回目)。何もかも失った状態で、土下座すると。',
-    '045': '魔王(2回目)。装備だけが決め手となった状態で、奥義を使うと。',
-    '046': '魔王(2回目)。ステータスだけが決め手となった状態で、奥義を使うと。',
-    '047': '魔王(2回目)。仲間だけが決め手となった状態で、奥義を使うと。',
-    '048': '魔王(2回目)。装備・ステータス・仲間のうち、2つが揃った状態で、奥義を使うと。',
-    '049': '魔王(2回目)。装備・ステータス・仲間の3つが揃った状態で、奥義を使うと。',
-    '050': '魔王(2回目)。旅の途中で、ある人物と出会った後に、助けを呼ぶと。'
+    '027': 'ライバル。装備が頼りないまま、仲間もなく挑むと。',
+    '028': 'ライバル。貧弱な装備で、仲間に誘うと。',
+    '029': '中級の魔物(オーク)。力が足りないまま、突破しようとすると。',
+    '030': '中級の魔物(骸骨剣士)。力が足りないまま、突破しようとすると。',
+    '031': '強級の魔物(ワイバーン)。力が足りないまま、突破しようとすると。',
+    '032': '強級の魔物(獄炎の将軍)。力が足りないまま、突破しようとすると。',
+    '033': '強級の魔物。守りに入ると。',
+    '034': '中級以上の魔物。魔物の前で、時間が過ぎると。',
+    '035': '魔物。現実から目を背けると。',
+    '036': '魔王。力が足りないまま、正面から戦うと。',
+    '037': '魔王。いないはずの仲間に、戦わせようとすると。',
+    '038': '魔王。その場しのぎと愛嬌が足りないまま、世間話をすると。',
+    '039': '魔王。度胸と慎重さが足りないまま、歌うと。',
+    '040': '魔王。所持金が足りないまま、カツアゲされると。',
+    '041': '魔王(2回目)。条件が整わないまま、奥義を使うと。',
+    '042': '魔王(2回目)。条件が合わないまま、土下座すると。',
+    '043': '魔王(2回目)。助けを呼んだが、誰も来なかった。',
+    '044': '魔王。魔王の前で、時間が過ぎると。',
+    '045': '魔王(2回目)。戦わずに、逃げ出すと。',
+    '046': '魔王(2回目)。何もかも失った状態で、土下座すると。',
+    '047': '魔王(2回目)。装備だけが決め手となった状態で、奥義を使うと。',
+    '048': '魔王(2回目)。ステータスだけが決め手となった状態で、奥義を使うと。',
+    '049': '魔王(2回目)。仲間だけが決め手となった状態で、奥義を使うと。',
+    '050': '魔王(2回目)。装備・ステータス・仲間のうち、2つが揃った状態で、奥義を使うと。',
+    '051': '魔王(2回目)。装備・ステータス・仲間の3つが揃った状態で、奥義を使うと。',
+    '052': '魔王(2回目)。旅の途中で、ある人物と出会った後に、助けを呼ぶと。'
   };
   Object.keys(HINTS).forEach(function (k) { ENDS[k].hint = HINTS[k]; });
 
@@ -495,25 +499,25 @@ const GAME = (function () {
       timeout: { type: 'branch', msg: '迷っているうちに、商人は別の客のところへ行ってしまった。', fx: {} }
     };
   }
-  function makeTraveler(allyKey, price, q, who) {
+  function makeTraveler(allyKey, price, q, who, abductNeed) {
     return {
       id: 'trav_' + allyKey, sec: 'C', kind: 'traveler', w: 1, icon: 'p_traveler', who: who, q: q,
       choices: [
         { label: '雇う', act: 'hire', ally: allyKey, price: price },
         { label: '頼み込む', act: 'plead', ally: allyKey },
-        { label: '連れ去る', act: 'abduct', ally: allyKey, ends: ['023'] },
+        { label: '連れ去る', act: 'abduct', ally: allyKey, need: abductNeed, ends: ['023'] },
         { label: '諦める', act: 'leave' }
       ],
       timeout: { type: 'branch', msg: '迷っているうちに、旅人は去っていった。', fx: {} }
     };
   }
-  /* 最強の旅人。雇う値段は50銀貨(払えない)。どの選択肢でも仲間にならず、ペナルティもない。出会うと flag が立つ */
+  /* 最強の旅人。雇う値段は80銀貨(払えない)。どの選択肢でも仲間にならず、ペナルティもない。出会うと flag が立つ */
   function makeTravelerMax() {
     return {
       id: 'trav_max', sec: 'C', w: 1, icon: 'p_legend', who: '伝説の旅人', flag: 'metMax',
-      q: '圧倒的な気配をまとった旅人が、静かに言った。\n「50銀貨で、雇われてやろう」',
+      q: '圧倒的な気配をまとった旅人が、静かに言った。\n「80銀貨で、雇われてやろう」',
       choices: [
-        { label: '雇う', fx: {}, msg: 'どう数えても、50銀貨には届かなかった。\n旅人は、静かに首を振った。' },
+        { label: '雇う', fx: {}, msg: 'どう数えても、80銀貨には届かなかった。\n旅人は、静かに首を振った。' },
         { label: '頼み込む', fx: {}, msg: '頼み込んだが、旅人は微笑むだけだった。\n「また、いつか」' },
         { label: '連れ去る', fx: {}, msg: '手を伸ばした瞬間、視界が一回転した。\n気づくと、元の場所に立っていた。' },
         { label: '諦める', fx: {}, msg: '旅人は、静かに去っていった。\nなぜか、また会える気がした。' }
@@ -524,8 +528,8 @@ const GAME = (function () {
   const CARDS_C = [
     makeShop('w1'), makeShop('w2'), makeShop('w3'),
     makeShop('a1'), makeShop('a2'), makeShop('a3'),
-    makeTraveler('weak', 3, '駆け出しの旅人が、心細そうに言った。\n「3銀貨で、雇ってくれませんか…?」', '弱そうな旅人'),
-    makeTraveler('strong', 5, '傷だらけの旅人が、静かに言った。\n「5銀貨なら、雇われてやってもいい」', '強そうな旅人'),
+    makeTraveler('weak', 4, '駆け出しの旅人が、心細そうに言った。\n「4銀貨で、雇ってくれませんか…?」', '弱そうな旅人', 7),
+    makeTraveler('strong', 12, '傷だらけの旅人が、静かに言った。\n「12銀貨なら、雇われてやってもいい」', '強そうな旅人', 9),
     makeTravelerMax()
   ];
 
@@ -566,9 +570,9 @@ const GAME = (function () {
     id: 'C', forced: true, icon: 'p_rival', who: 'ライバル', q: '「ここは通さないぜ!\n魔王を倒すのは俺だ!」',
     showCount: 4,
     choices: [
-      { label: '戦う', fixed: true, act: 'fight' },
+      { label: '戦う', fixed: true, act: 'fight', ends: ['027'] },
       { label: '逃げる', fixed: true, act: 'flee', ends: ['024'] },
-      { label: '仲間になろうと誘う', act: 'recruit' },
+      { label: '仲間になろうと誘う', act: 'recruit', ends: ['028'] },
       { label: '貫禄を見せつける', act: 'presence' },
       { label: 'じゃんけんをする', act: 'janken', ends: ['025'] },
       { label: '有り金を差し出す', act: 'allin' }
@@ -591,8 +595,8 @@ const GAME = (function () {
     const choices = [
       { label: '戦う', fixed: true, act: 'mfight', ends: defeatEnd ? [defeatEnd] : [] },
       { label: '隠れる', fixed: true, act: 'hide' },
-      { label: 'ガードする', fixed: true, act: 'guard', ends: tier === 3 ? ['031'] : [] },
-      { label: '現実から逃げる', act: 'dream', ends: ['033'] }
+      { label: 'ガードする', fixed: true, act: 'guard', ends: tier === 3 ? ['033'] : [] },
+      { label: '現実から逃げる', act: 'dream', ends: ['035'] }
     ];
     Object.keys(MSTAT).forEach(function (k) {
       choices.push({ label: MSTAT[k].label, act: 'mstat', stat: k, ends: defeatEnd ? [defeatEnd] : [] });
@@ -603,16 +607,16 @@ const GAME = (function () {
       choices: choices,
       timeout: tier === 1
         ? { type: 'branch', msg: '迷っているうちに、銀貨を落としてしまった。', fx: {}, gold: -2 }
-        : { type: 'end', end: '032' }
+        : { type: 'end', end: '034' }
     };
   }
   const CARDS_D = [
     makeMonster('m_slime', 'スライム', 1, 'ぷるぷるしたスライムが、\n飛びかかってきた!', null, 'スライムだ。こちらに気づいた!'),
     makeMonster('m_bat', 'コウモリ', 1, '無数のコウモリが、\n頭上を舞っている!', null, 'コウモリだ。こちらに気づいた!'),
-    makeMonster('m_orc', 'オーク', 2, '巨大なオークが、\n棍棒を振り上げた!', '027', 'オークだ。こちらに気づいた!'),
-    makeMonster('m_skel', '骸骨剣士', 2, '骸骨の剣士が、\nカタカタと迫ってくる!', '028', '骸骨剣士だ。こちらに気づいた!'),
-    makeMonster('m_wyvern', 'ワイバーン', 3, '空から、ワイバーンが\n急降下してきた!', '029', 'ワイバーンだ。こちらに気づいた!'),
-    makeMonster('m_general', '獄炎の将軍', 3, '「ここから先は、通さん」\n炎をまとった将軍が立ちはだかる!', '030', '獄炎の将軍だ。こちらに気づいた!'),
+    makeMonster('m_orc', 'オーク', 2, '巨大なオークが、\n棍棒を振り上げた!', '029', 'オークだ。こちらに気づいた!'),
+    makeMonster('m_skel', '骸骨剣士', 2, '骸骨の剣士が、\nカタカタと迫ってくる!', '030', '骸骨剣士だ。こちらに気づいた!'),
+    makeMonster('m_wyvern', 'ワイバーン', 3, '空から、ワイバーンが\n急降下してきた!', '031', 'ワイバーンだ。こちらに気づいた!'),
+    makeMonster('m_general', '獄炎の将軍', 3, '「ここから先は、通さん」\n炎をまとった将軍が立ちはだかる!', '032', '獄炎の将軍だ。こちらに気づいた!'),
     Object.assign(makeTravelerMax(), { sec: 'D', w: 0.3 })     // 低確率。ランダムCで会っていたら、ここには出ない
   ];
 
@@ -625,21 +629,21 @@ const GAME = (function () {
     intro1: '玉座に、誰かが座っている…', intro2: '魔王だ。こちらを見ている。',
     q: '「よく来たな、勇者よ。\n…さあ、どうする?」',
     choices: [
-      { label: '戦う', fixed: true, act: 'bfight', ends: ['034'] },
+      { label: '戦う', fixed: true, act: 'bfight', ends: ['036'] },
       { label: '逃げる', fixed: true, act: 'bflee' },
-      { label: '仲間に戦わせる', fixed: true, act: 'ballies', ends: ['035'] },
-      { label: '世間話をする', act: 'bchat', ends: ['036'] },
-      { label: '歌を歌う', act: 'bsing', ends: ['037'] },
-      { label: 'カツアゲされる', act: 'bmug', ends: ['038'] }
+      { label: '仲間に戦わせる', fixed: true, act: 'ballies', ends: ['037'] },
+      { label: '世間話をする', act: 'bchat', ends: ['038'] },
+      { label: '歌を歌う', act: 'bsing', ends: ['039'] },
+      { label: 'カツアゲされる', act: 'bmug', ends: ['040'] }
     ],
     q2: '魔王が、こちらを睨んでいる。\n「次で、決着をつけよう」',
     choices2: [
-      { label: '奥義を使う', act: 'ult', ends: ['039', '045', '046', '047', '048', '049'] },
-      { label: '逃げる', act: 'home', ends: ['043'] },
-      { label: '土下座する', act: 'bow', ends: ['040', '044'] },
-      { label: '助けを呼ぶ', act: 'help', ends: ['041', '050'] }
+      { label: '奥義を使う', act: 'ult', ends: ['041', '047', '048', '049', '050', '051'] },
+      { label: '逃げる', act: 'home', ends: ['045'] },
+      { label: '土下座する', act: 'bow', ends: ['042', '046'] },
+      { label: '助けを呼ぶ', act: 'help', ends: ['043', '052'] }
     ],
-    timeout: { type: 'end', end: '042' }
+    timeout: { type: 'end', end: '044' }
   };
 
   /* ---- 実行時の状態 ---- */
@@ -751,14 +755,16 @@ const GAME = (function () {
     }
     switch (choice.act) {
       case 'fight':
-        if (hasRank(run, 2)) return { msg: '装備を構えて斬り結ぶと、ライバルは尻もちをついた。\n「くそっ…通れ!」', pass: true };
-        return { msg: '装備が心もとなく、あっさり押し負けた。\nライバルは勝ち誇って、道を空けた。' + (run.allies.length ? '\nしかも、仲間を引き抜かれた。' : ''),
+        if (equipSum(run) >= 2) return { msg: '装備を構えて斬り結ぶと、ライバルは尻もちをついた。\n「くそっ…通れ!」', pass: true };
+        if (!run.allies.length) return { end: '027' };      // 装備が弱く、奪われる仲間もいない
+        return { msg: '装備が心もとなく、あっさり押し負けた。\nライバルは勝ち誇って、仲間を引き抜いて、道を空けた。',
           loseAlly: true, pass: true };
       case 'flee':
         return { end: '024' };
       case 'recruit':
         if (hasRank(run, 3)) return { msg: '上等な装備に、ライバルの目の色が変わった。\n「面白い。俺も行こう」', ally: ALLIES.rival, pass: true };
-        return { msg: '「装備が貧弱だな」と鼻で笑われた。\n自信をなくして、とぼとぼと通り抜けた。', fx: allFx(-1), pass: true };
+        if (hasRank(run, 2)) return { msg: '「装備が貧弱だな」と鼻で笑われた。\n自信をなくして、とぼとぼと通り抜けた。', fx: allFx(-1), pass: true };
+        return { end: '028' };                                // 下位の装備だけでは、相手にされない
       case 'presence':
         if (total(run) >= 6) return { msg: '全身から漂う貫禄に、ライバルはたじろいだ。\n「…通れ」', pass: true };
         return { msg: '貫禄が足りず、取り囲まれた。\n装備を置いていくことで、通してもらえた。', loseEquip: true, pass: true };
@@ -798,7 +804,7 @@ const GAME = (function () {
         if (STATS.some(function (s) { return run.stats[s.key] > 4; })) return { msg: '頼み込むと、' + a.name + 'は根負けした。\n「…仕方ない、付き合おう」', ally: a };
         return { msg: '「悪いが、他を当たってくれ」\n特に何も起きなかった。' };
       case 'abduct':
-        if (total(run) > 8) return { msg: '有無を言わさず連れ去った。\nなぜか、' + a.name + 'は納得してくれた。', ally: a };
+        if (total(run) >= choice.need) return { msg: '有無を言わさず連れ去った。\nなぜか、' + a.name + 'は納得してくれた。', ally: a };
         return { end: '023' };
       case 'leave':
         return { msg: '旅人を見送った。\nなぜか良い旅になる気がして、気力が湧いた。', fx: allFx(1) };
@@ -811,8 +817,8 @@ const GAME = (function () {
     switch (choice.act) {
       case 'mfight': {
         const win = t === 1 ? (total(run) >= 6 || run.equip.length >= 1 || run.allies.length >= 1)
-          : t === 2 ? (equipSum(run) >= 2 || total(run) >= 8 || allyPower(run) >= 3)
-          : (equipSum(run) >= 4 || total(run) >= 10 || allyOk(run));
+          : t === 2 ? (equipSum(run) >= 2 || total(run) >= 9 || allyPower(run) >= 3)
+          : (equipSum(run) >= 4 || total(run) >= 11 || allyOk(run));
         if (!win) {
           if (t === 1) return { msg: '返り討ちに遭った。\n命からがら、逃げ出した。', fx: allFx(-1) };
           return { end: card.defeatEnd };
@@ -832,7 +838,7 @@ const GAME = (function () {
         return { msg: '物陰に隠れて、やり過ごした。\n息を潜めるうちに、' + s.label + 'が研ぎ澄まされた。', fx: fx };
       }
       case 'guard': {
-        if (t === 3) return { end: '031' };
+        if (t === 3) return { end: '033' };
         const s = randStat(rng), fx = {};
         fx[s.key] = 2;
         return { msg: '身を固めて、攻撃を受け止めた。\n' + s.label + 'が鍛えられた気がする。', fx: fx };
@@ -844,9 +850,9 @@ const GAME = (function () {
         return { end: card.defeatEnd };
       }
       case 'dream':
-        return { end: '033' };
+        return { end: '035' };
     }
-    return { end: '032' };
+    return { end: '034' };
   }
 
   /* イベントD。stage=1(1回目) / 2(2回目)。next=true なら、結果のあとに2回目へ進む */
@@ -855,8 +861,8 @@ const GAME = (function () {
     if (stage === 1) {
       switch (choice.act) {
         case 'bfight':
-          if (equipMid(run) || total(run) >= 10 || allyOk(run)) return { msg: '渾身の一撃が、魔王に届いた。\n魔王が、わずかによろめいた。', next: true };
-          return { end: '034' };
+          if (equipMid(run) || total(run) >= 12 || allyOk(run)) return { msg: '渾身の一撃が、魔王に届いた。\n魔王が、わずかによろめいた。', next: true };
+          return { end: '036' };
         case 'bflee': {
           const o = { msg: '背を向けて逃げ出した。\nだが、魔王に回り込まれた。', fx: allFx(-1), loseAllAllies: true, next: true };
           if (run.equip.length) o.loseSlot = run.equip[Math.floor(rng() * run.equip.length)].slot;   // 装備はランダムで片方を失う
@@ -864,35 +870,35 @@ const GAME = (function () {
         }
         case 'ballies':
           if (run.allies.length) return { msg: '「行け、仲間たちよ!」\n仲間は魔王に挑んだが、やられてしまった。', loseAllAllies: true, next: true };
-          return { end: '035' };
+          return { end: '037' };
         case 'bchat':
           if (run.stats.improv + run.stats.charm >= 6) return { msg: '天気の話で、なぜか盛り上がった。\n魔王が、ふと油断した。', next: true };
-          return { end: '036' };
+          return { end: '038' };
         case 'bsing':
           if (run.stats.courage + run.stats.caution >= 6) return { msg: '渾身の歌声が、魔王城に響いた。\n魔王が、耳をふさいでうずくまった。', next: true };
-          return { end: '037' };
+          return { end: '039' };
         case 'bmug':
           if (run.money >= 5) return { msg: '「金を出せ」と、魔王にカツアゲされた。\n財布を差し出すと、魔王は上機嫌になった。', gold: -run.money, next: true };
-          return { end: '038' };
+          return { end: '040' };
       }
       return { end: card.timeout.end };
     }
     switch (choice.act) {
       case 'ult': {
-        const a = equipTop(run), b = total(run) >= 11, c = allyOk(run);
+        const a = equipTop(run), b = total(run) >= 14, c = allyOk(run);
         const n = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-        if (n === 0) return { end: '039' };
-        if (n === 3) return { end: '049' };
-        if (n === 2) return { end: '048' };
-        return { end: a ? '045' : b ? '046' : '047' };
+        if (n === 0) return { end: '041' };
+        if (n === 3) return { end: '051' };
+        if (n === 2) return { end: '050' };
+        return { end: a ? '047' : b ? '048' : '049' };
       }
       case 'home':
-        return { end: '043' };
+        return { end: '045' };
       case 'bow':
-        if (run.allies.length === 0 && rankOf(run, 'weapon') + rankOf(run, 'armor') <= 2 && total(run) <= 5) return { end: '044' };
-        return { end: '040' };
+        if (run.allies.length === 0 && rankOf(run, 'weapon') + rankOf(run, 'armor') <= 2 && total(run) <= 5) return { end: '046' };
+        return { end: '042' };
       case 'help':
-        return { end: run.flags.metMax ? '050' : '041' };
+        return { end: run.flags.metMax ? '052' : '043' };
     }
     return { end: card.timeout.end };
   }
