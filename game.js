@@ -2,6 +2,9 @@
 (function () {
   'use strict';
   const G = GAME, C = COMMON, STATS = G.STATS, ENDS = G.ENDS;
+  const DEV = (typeof DEVPLAY !== 'undefined' && DEVPLAY.active) ? DEVPLAY : null;   // 開発者モード(パスワードで入った時だけ)
+  const FREEZE_MS = 200;                                       // 選んだあと、「選べた」ことを確認させる間
+  const rng = function () { return DEV ? DEV.rng() : Math.random(); };
   const SHOWN = G.TIME_LIMIT;                                  // 画面に出る秒数(3.0)
   const LIMIT = (typeof window.__LIMIT === 'number') ? window.__LIMIT : G.TIME_LIMIT * G.TIME_SCALE;   // 実際の制限(3.6秒)
   const SCALE = LIMIT / SHOWN;                                  // 表示の進みは、実時間より少しゆっくり
@@ -130,18 +133,34 @@
     readyAt = performance.now() + 150;            // 直前のタップの誤爆を防ぐ
     const buttons = stage.querySelectorAll('.choice');
     function lock() { buttons.forEach(function (b) { b.disabled = true; }); }
+    /* 選んだ選択肢の色を変え、ほかを沈ませる(エンドへ向かう時は、すぐ戻す) */
+    function mark(b, on) {
+      buttons.forEach(function (x) { x.classList.toggle('picked', on && x === b); x.classList.toggle('dim', on && x !== b); });
+    }
     buttons.forEach(function (b) {
       b.addEventListener('click', function () {
         if (done || performance.now() < readyAt) return;
         done = true; stopTimer(); lock();
-        o.onPick(Number(b.getAttribute('data-i')));
+        SFX.bgmStop();
+        mark(b, true);
+        /* onPick は、エンドにならない時だけ「次の処理」を返す。その場合は、少し止めてから進む */
+        const next = o.onPick(Number(b.getAttribute('data-i')));
+        if (typeof next === 'function') { SFX.beep(); setTimeout(next, FREEZE_MS); } else mark(b, false);
       });
     });
-    startTimer(function () {
+    function expire() {
       if (done) return;
       done = true; lock();
+      SFX.bgmStop();
       o.onTimeout();
-    });
+    }
+    if (o.mark != null && o.mark >= 0) {
+      const t = stage.querySelector('.choice[data-i="' + o.mark + '"]');
+      if (t) t.classList.add('dev-target');
+    }
+    if (DEV) DEV.setExpire(expire);
+    if (DEV && DEV.noTimer) { $('#clockNum').textContent = '∞'; return; }   // 開発者モード: 時間を止めておける
+    startTimer(expire);
   }
 
   /* --- タップで進む画面 --- */
@@ -151,6 +170,7 @@
     readyAt = performance.now() + 180;
     function go() {
       if (performance.now() < readyAt) return;
+      SFX.beep();
       onNext();
     }
     const btn = $('#nextBtn'), win = stage.querySelector('.window');
@@ -165,54 +185,86 @@
     const html =
       '<div class="portrait" aria-hidden="true">' + (first ? '？' : (card.icon ? C.pixelSVG(card.icon) : '！')) + '</div>' +
       '<div class="window tappable">' + (first ? '' : '<div class="plate">' + card.who + '</div>') +
-      '<p class="line">' + (first ? (card.intro1 || 'あれ、あそこにいるのは…') : (card.intro2 || card.who + 'だ。何か用があるみたいだ。')) + '</p>' +
+      '<p class="line">' + (first ? (card.intro1 || tx('あれ、あそこにいるのは…')) : (card.intro2 || tx('{w}だ。何か用があるみたいだ。', { w: card.who }))) + '</p>' +
       '<span class="more" aria-hidden="true">▼</span></div>';
-    showTap(html, '次へ', function () {
-      if (first) showIntro(card, 2); else showQuestion(card);
-    });
+    function open() {
+      showTap(html, tx('次へ'), function () {
+        if (first) showIntro(card, 2); else showQuestion(card);
+      });
+    }
+    /* 門番・ライバル・魔王は、「〇〇〇だ」の直前に立ち絵をカットインさせる */
+    if (!first && typeof PORTRAITS !== 'undefined' && PORTRAITS[card.id]) cutIn(PORTRAITS[card.id], open, card.id); else open();
+  }
+
+  /* カットイン: 0.1秒でフェードインしながら右から入り、表示したあと、0.1秒でフェードアウトしながら左へ抜ける。
+     表示時間は、関所・ライバルが0.5秒(計0.7秒)、魔王が0.8秒(計1.0秒)。立ち絵以外は透明 */
+  const CUT_IN_MS = 100, CUT_OUT_MS = 100, CUT_HOLD_MS = { B: 500, C: 500, D: 800 };
+  function cutIn(svg, done, id) {
+    SFX.bgm({ B: 'gate', C: 'rival', D: 'demon' }[id]);
+    const hold = CUT_HOLD_MS[id] || 500;
+    const el = document.createElement('div');
+    el.className = 'cutin';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = svg;
+    document.body.appendChild(el);
+    let finished = false;
+    function end() { if (finished) return; finished = true; if (el.parentNode) el.parentNode.removeChild(el); done(); }
+    requestAnimationFrame(function () { el.classList.add('on'); });
+    setTimeout(function () { el.classList.remove('on'); el.classList.add('out'); }, CUT_IN_MS + hold);
+    setTimeout(end, CUT_IN_MS + hold + CUT_OUT_MS);
   }
 
   function showQuestion(card, stage) {
     stage = stage || 1;
     const boss = card.id === 'D';
     const list = stage === 2 ? card.choices2 : card.choices;   // ランダムに選ばれた選択肢は、進行表を作る時に決まっている
+    const who = boss ? tx('{w}({n}回目)', { w: card.who, n: stage }) : card.who;
+    const preset = DEV ? C.devPreset() : null;
     showChoice({
       who: card.who, q: stage === 2 ? card.q2 : card.q, shuffle: true,
       labels: list.map(function (c) { return c.label; }),
+      mark: preset && preset.pick ? list.map(function (c) { return c.label; }).indexOf(preset.pick) : -1,
       onPick: function (i) {
         const choice = list[i];
-        run.history.push({ who: card.who + (boss ? '(' + stage + '回目)' : ''), text: choice.label });
-        const out = boss ? G.resolveBoss(run, card, stage, choice, Math.random) : G.resolveChoice(run, card, choice);
-        finishStep(out, out.next ? function () { showQuestion(card, 2); } : null);
+        run.history.push({ who: who, text: choice.label });
+        const used = [];                                        // 判定で使った乱数(開発者モードの記録用)
+        const rr = function () { const v = rng(); used.push(v); return v; };
+        const out = boss ? G.resolveBoss(run, card, stage, choice, rr) : G.resolveChoice(run, card, choice, rr);
+        const meta = { who: who, label: choice.label, rng: used };
+        const after = out.next ? function () { showQuestion(card, 2); } : null;
+        if (out.end) { finishStep(out, after, meta); return; }          // エンドへは、止めずに進む
+        return function () { finishStep(out, after, meta); };            // それ以外は、選べたことを確認させてから進む
       },
       onTimeout: function () {
-        run.history.push({ who: card.who + (boss ? '(' + stage + '回目)' : ''), text: '(時間切れ)' });
-        finishStep(G.resolveTimeout(run, card));
+        run.history.push({ who: who, text: tx('(時間切れ)') });
+        finishStep(G.resolveTimeout(run, card), null, { who: who, label: tx('(時間切れ)') });
       }
     });
   }
 
-  function finishStep(out, after) {
+  function finishStep(out, after, meta) {
+    const before = DEV ? DEV.snap(run) : null;
     G.applyOutcome(run, out);
+    if (DEV) DEV.log(before, DEV.snap(run), out, meta);
     setStatus(run.stats, out.fx);
     setPurse(run.money, out.goldDelta);
     setGear();
-    if (out.end) { leave(out.end); return; }
+    if (out.end) { leave(out.end, out.why); return; }
     const parts = STATS.filter(function (s) { return out.fx && out.fx[s.key]; }).map(function (s) {
       return [s.label, out.fx[s.key]];
     });
-    if (out.goldDelta) parts.push(['所持金', out.goldDelta]);
+    if (out.goldDelta) parts.push([tx('所持金'), out.goldDelta]);
     let chips = parts.map(function (p) {
       const v = p[1];
       return '<span class="chip ' + (v > 0 ? 'plus' : 'minus') + '">' + p[0] + ' ' + (v > 0 ? '+' : '−') + Math.abs(v) + '</span>';
     }).join('');
     chips += (out.notes || []).map(function (n) {
-      return '<span class="chip ' + (n.v > 0 ? 'plus' : 'minus') + '">' + n.t + (n.v > 0 ? ' 獲得' : ' 喪失') + '</span>';
+      return '<span class="chip ' + (n.v > 0 ? 'plus' : 'minus') + '">' + n.t + (n.v > 0 ? tx(' 獲得') : tx(' 喪失')) + '</span>';
     }).join('');
     showTap(
       '<div class="window tappable"><p class="line">' + out.msg + '</p><span class="more" aria-hidden="true">▼</span></div>' +
       '<div class="deltas">' + chips + '</div>',
-      '次へ', after || nextCard
+      tx('次へ'), after || nextCard
     );
   }
 
@@ -232,7 +284,7 @@
     if (nxt) prefetch(candidates(nxt));
     showTap(
       '<div class="window tappable"><p class="line">' + card.text + '</p><span class="more" aria-hidden="true">▼</span></div>',
-      '次へ', nextCard
+      tx('次へ'), nextCard
     );
   }
   /* 進行表から、進行表示(A / 1 2 3 / B / 1 2 … / C)を作る */
@@ -246,7 +298,7 @@
     });
   }
   function startRun() {
-    run.queue = G.buildQueue(Math.random);
+    run.queue = G.buildQueue(rng);
     buildPips();
     run.i = -1;
     nextCard();
@@ -256,7 +308,7 @@
     if (n >= G.STORY.length) { startRun(); return; }
     showTap(
       '<div class="window tappable story"><p class="line">' + G.STORY[n] + '</p><span class="more" aria-hidden="true">▼</span></div>',
-      '次へ', function () { showStory(n + 1); }
+      tx('次へ'), function () { showStory(n + 1); }
     );
   }
   function showStart() {
@@ -268,51 +320,61 @@
     setPips(0);
     prefetch(['000', '999']);
     showChoice({
-      who: null, q: '始めますか。', shuffle: false, labels: ['始める', '始めない'],
+      who: null, q: tx('始めますか。'), shuffle: false, labels: [tx('始める'), tx('始めない')],
+      mark: (DEV && C.devPreset() && C.devPreset().pick) ? ['始める', '始めない'].indexOf(C.devPreset().pick) : -1,
       onPick: function (i) {
-        if (i === 0) { run.history.push({ who: 'A', text: '始める' }); showStory(0); }
-        else { run.history.push({ who: 'A', text: '始めない' }); leave('999'); }
+        if (i === 0) { run.history.push({ who: 'A', text: tx('始める') }); return function () { showStory(0); }; }
+        run.history.push({ who: 'A', text: tx('始めない') });
+        leave('999');
       },
       onTimeout: function () {
-        run.history.push({ who: 'A', text: '(時間切れ)' });
+        run.history.push({ who: 'A', text: tx('(時間切れ)') });
         leave('000');
       }
     });
   }
 
   /* --- エンドのページへ移る。暗転は挟まず、点滅と揺れで切る --- */
-  function leave(code) {
+  function leave(code, why) {
     if (leaving) return;
     leaving = true;
     stopTimer();
-    const cx = C.loadCodex();
-    const isNew = !cx[code];
-    cx[code] = { n: ((cx[code] && cx[code].n) || 0) + 1, t: Date.now() };
-    C.saveCodex(cx);
+    const e = ENDS[code];
+    const record = !(DEV && !DEV.record);          // 開発者モードでは、図鑑に記録しないことも選べる
+    let cx = C.loadCodex(), isNew = false, fresh = [];
+    if (record) {
+      isNew = !cx[code];
+      cx[code] = { n: ((cx[code] && cx[code].n) || 0) + 1, t: Date.now() };
+      C.saveCodex(cx);
+      fresh = C.grantBadges(Object.keys(cx).length);   // 収集数がバッジの条件に届いたら獲得(通知は結果画面の3秒後)
+    }
+    if (DEV) DEV.logEnd(code, run);
     const last = {
-      code: code, isNew: isNew, t: Date.now(),
+      code: code, why: why || '', isNew: isNew, t: Date.now(), badges: fresh, dev: !!DEV && !record,
       stats: Object.assign({}, run.stats), money: run.money, history: run.history.slice(),
       equip: run.equip.map(G.equipLabel), allies: run.allies.map(function (a) { return a.name; })
     };
     C.saveLast(last);
     C.handoff({ codex: cx, last: last });         // 移動先へ直接も渡す
     const go = function () { location.replace(C.endUrl(code)); };   // 履歴に残さない(戻るでプレイの途中に戻らないため)
-    if (ENDS[code].epilogue) { showEpilogue(ENDS[code].epilogue, go); return; }
-    const kind = ENDS[code].kind;
+    if (e.epilogue) { showEpilogue(e, go); return; }
+    SFX.play(e.sfx);                                                    // 途中エンド・敗北は、1秒未満の短い音
+    const kind = e.kind;
     if (kind === 'fail') document.body.classList.add('hit-fail');       // 赤い点滅(0.56秒)
     else if (kind !== 'quit') document.body.classList.add('hit-ok');
     setTimeout(go, kind === 'quit' ? 500 : 1060);                       // 点滅(0.56秒)のあと、0.5秒置いて結果へ
   }
 
-  /* 勝利エンド: 長めのフェードアウト → 一文 → エンドのページへ(タップで飛ばせる) */
-  function showEpilogue(text, go) {
+  /* 長めのエンド(討伐・最強・伝説・手下・余生): 長めのフェードアウト → 一文 → エンドのページへ(タップで飛ばせる) */
+  function showEpilogue(e, go) {
     const v = document.createElement('div');
-    v.className = 'veil';
+    v.className = 'veil fx-' + e.sfx;
     v.innerHTML = '<p class="veil-text"></p>';
-    v.firstChild.textContent = text;
+    v.firstChild.textContent = e.epilogue;
     document.body.appendChild(v);
     void v.offsetWidth;
     v.classList.add('on');
+    SFX.play(e.sfx);                                                    // 3〜5秒の音。暗転と同時に鳴らす
     let moved = false;
     const next = function () { if (moved) return; moved = true; go(); };
     setTimeout(function () { v.addEventListener('click', next); }, 3200);
@@ -328,6 +390,43 @@
   });
   window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
 
+  /* --- 音: 最初の操作で使えるようにする。右上のボタンで切り替え --- */
+  const sndBtn = document.getElementById('sndBtn');
+  function paintSnd() {
+    if (!sndBtn) return;
+    sndBtn.textContent = SFX.isOn() ? '♪ ON' : '♪ OFF';
+    sndBtn.setAttribute('aria-pressed', SFX.isOn() ? 'true' : 'false');
+    sndBtn.setAttribute('aria-label', SFX.isOn() ? tx('効果音: オン(押すとオフ)') : tx('効果音: オフ(押すとオン)'));
+  }
+  document.addEventListener('pointerdown', function () { SFX.unlock(); }, true);
+  document.addEventListener('keydown', function () { SFX.unlock(); }, true);
+  if (sndBtn) sndBtn.addEventListener('click', function () {
+    SFX.setOn(!SFX.isOn());
+    paintSnd();
+    if (SFX.isOn()) SFX.play('mid');                  // 鳴ることの確認
+  });
+  paintSnd();
+
+  /* --- 開発者モード: エンドの直前から始める --- */
+  function startPreset(p) {
+    run = G.newRun();
+    const st = p.state || {};
+    Object.keys(st.stats || {}).forEach(function (k) { run.stats[k] = st.stats[k]; });
+    if (typeof st.money === 'number') run.money = st.money;
+    run.equip = (st.equip || []).map(function (k) { return G.ITEMS[k]; }).sort(function (a, b) { return a.slot < b.slot ? 1 : -1; });
+    run.allies = (st.allies || []).map(function (k) { return G.ALLIES[k]; });
+    run.flags = Object.assign({}, st.flags || {});
+    run.silence = st.silence || 0;
+    setGear(); setStatus(run.stats); setPurse(run.money);
+    pipLabels = ['DEV']; setPips(0);
+    run.history.push({ who: 'DEV', text: '開発者モード: No.' + p.code + ' の直前から開始' });
+    if (p.kind === 'start') { showStart(); return; }
+    const card = G.findCard(p.card);
+    run.queue = [card]; run.i = 0; pipOf = [0];
+    G.encounter(run, card);
+    showQuestion(card, p.stage || 1);
+  }
+
   /* --- 起動 --- */
   buildStatus();
   C.updateCollect();
@@ -335,7 +434,12 @@
   setPurse(G.START_MONEY);
   setPips(0);
   let started = false;
-  function boot() { if (started) return; started = true; showStart(); }
+  function boot() {
+    if (started) return; started = true;
+    if (DEV) DEV.mount();
+    const preset = DEV ? C.devPreset() : null;
+    if (preset) startPreset(preset); else showStart();
+  }
   if (document.fonts && document.fonts.ready) {
     Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 700); })]).then(boot);
   } else {

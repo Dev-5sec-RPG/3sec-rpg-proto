@@ -4,16 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>3秒即断RPG｜3秒以内に選び続ける、無料のブラウザゲーム</title>
-<meta name="description" content="3秒以内に選び続ける、無料のブラウザゲーム。ステータスと装備で結末が変わる、短いRPG。全54種類のエンドを集めよう。">
+<meta name="description" content="3秒以内に選び続ける、無料のブラウザゲーム。ステータスと装備で結末が変わる、短いRPG。全45種類のエンドを集めよう。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="3秒即断RPG">
 <meta property="og:title" content="3秒即断RPG｜3秒以内に選び続ける、無料のブラウザゲーム">
-<meta property="og:description" content="3秒以内に選び続ける、無料のブラウザゲーム。ステータスと装備で結末が変わる、短いRPG。全54種類のエンドを集めよう。">
+<meta property="og:description" content="3秒以内に選び続ける、無料のブラウザゲーム。ステータスと装備で結末が変わる、短いRPG。全45種類のエンドを集めよう。">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary">
 <meta property="og:url" content="https://3sec-rpg.com/">
 <link rel="canonical" href="https://3sec-rpg.com/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"3秒即断RPG","description":"3秒以内に選び続ける、無料のブラウザゲーム。ステータスと装備で結末が変わる、短いRPG。全54種類のエンドを集めよう。","applicationCategory":"GameApplication","operatingSystem":"Any","inLanguage":"ja","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+<link rel="alternate" hreflang="ja" href="https://3sec-rpg.com/">
+<link rel="alternate" hreflang="en" href="https://3sec-rpg.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://3sec-rpg.com/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"3秒即断RPG","description":"3秒以内に選び続ける、無料のブラウザゲーム。ステータスと装備で結末が変わる、短いRPG。全45種類のエンドを集めよう。","applicationCategory":"GameApplication","operatingSystem":"Any","inLanguage":"ja","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-50ZVKWN1C8"></script>
 <script>
@@ -31,18 +34,23 @@
 </head>
 <body>
 <main class="app" data-root="./">
-  <header class="top"><h1 class="brand">3秒即断RPG<small>(仮)</small></h1><span class="collect" id="collect">収集 0/54</span></header>
+  <header class="top"><h1 class="brand">3秒即断RPG<small>(仮)</small></h1><span class="top-r"><button class="snd" id="sndBtn" type="button" aria-pressed="true">♪ ON</button><span class="collect" id="collect">収集 0/45</span></span></header>
   <section class="status" id="status" aria-label="ステータス"></section>
   <ol class="pips" id="pips" aria-label="進行状況"></ol>
   <div class="row3"><div class="gear" id="gear"><div class="g-eq"><span>武器 <b id="gearW">―</b></span><span>防具 <b id="gearA">―</b></span></div><div class="g-ally"><span>仲間 <b id="gearF">―</b></span></div></div><div class="purse" id="purse">所持金 <b id="purseV">0</b>銀貨</div></div>
   <section class="stage" id="stage"></section>
-  <details class="about"><summary>このゲームについて</summary><p>「3秒即断RPG」は、3秒以内に選択肢を選び続けて、魔王を目指す、無料のブラウザゲームです。選ぶたびに、ステータス・装備・仲間・所持金が変わり、その状態で結末(エンド)が変わります。時間切れも、結末の一つです。全54種類のエンドを集めて、図鑑を完成させましょう。1回のプレイは、数分で終わります。</p></details>
-  <footer class="foot"><nav><a href="./privacy/index.html">プライバシーポリシー</a><a href="./contact/index.html">お問い合わせ</a></nav><small>© 2026 3秒即断RPG</small></footer>
+  <details class="about"><summary>このゲームについて</summary><p>「3秒即断RPG」は、3秒以内に選択肢を選び続けて、魔王を目指す、無料のブラウザゲームです。選ぶたびに、ステータス・装備・仲間・所持金が変わり、その状態で結末(エンド)が変わります。時間切れも、結末の一つです。全45種類のエンドを集めて、図鑑を完成させましょう。1回のプレイは、数分で終わります。</p></details>
+  <footer class="foot"><nav><a href="./privacy/index.html">プライバシーポリシー</a><a href="./contact/index.html">お問い合わせ</a><a class="lang-sw" href="./en/index.html" hreflang="en" lang="en">English</a></nav><small>© 2026 3秒即断RPG</small></footer>
 </main>
 <div class="flash" aria-hidden="true"></div>
 <noscript>このゲームにはJavaScriptが必要です。</noscript>
+<script src="lang.js"></script>
 <script src="engine.js"></script>
 <script src="common.js"></script>
+<script src="sound.js"></script>
+<script src="devlib.js"></script>
+<script src="devplay.js"></script>
+<script src="portraits.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

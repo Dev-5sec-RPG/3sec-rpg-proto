@@ -8,12 +8,12 @@
   function show(text, kind) { msg.textContent = text; msg.className = 'form-msg ' + kind; msg.hidden = false; }
 
   if (sent) {
-    show('送信しました。お問い合わせありがとうございます。', 'ok');
+    show(tx('送信しました。お問い合わせありがとうございます。'), 'ok');
     form.hidden = true;
     return;
   }
   if (!/^https?:$/.test(location.protocol)) {
-    show('このフォームは、公開後のページ(https://〜)でのみ送信できます。', 'ng');
+    show(tx('このフォームは、公開後のページ(https://〜)でのみ送信できます。'), 'ng');
     form.querySelector('button[type=submit]').disabled = true;
     return;
   }
@@ -22,7 +22,7 @@
   next.value = location.origin + location.pathname + '?sent=1';
   form.addEventListener('submit', function (ev) {
     const text = form.elements['message'].value.trim();
-    if (!text) { ev.preventDefault(); show('お問い合わせ内容を入力してください。', 'ng'); return; }
+    if (!text) { ev.preventDefault(); show(tx('お問い合わせ内容を入力してください。'), 'ng'); return; }
     if (form.querySelector('input[name=_honey]').value) { ev.preventDefault(); return; }
     form.querySelector('button[type=submit]').disabled = true;
   });

@@ -1,0 +1,309 @@
+/* ====== 効果音(Web Audio で合成する。音声ファイルは使わない) ======
+   種類: mid=途中エンド / defeat=敗北 / minion=魔王の手下 / victory=魔王討伐 / supreme=最強 / legend=伝説の旅人 / retire=余生
+   長さ: mid と defeat は1秒未満。他は 3〜5秒。 */
+const SFX = (function () {
+  'use strict';
+  const KEY = 'sansec_rpg_sound_v1';
+  let ctx = null, master = null, on = true, noiseBuf = null;
+  try { on = localStorage.getItem(KEY) !== 'off'; } catch (e) { /* 保存できない環境では、常に入り */ }
+
+  /* 音名 → 周波数。例: f('C5') */
+  const SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  function f(name) {
+    const m = /^([A-G])([#b]?)(\d)$/.exec(name);
+    const n = SEMI[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) + (Number(m[3]) + 1) * 12;
+    return 440 * Math.pow(2, (n - 69) / 12);
+  }
+
+  function make(target) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    const c = target || new AC();
+    const g = c.createGain();
+    g.gain.value = 0.55;
+    const comp = c.createDynamicsCompressor();
+    g.connect(comp); comp.connect(c.destination);
+    return { c: c, out: g };
+  }
+  function ensure() {
+    if (ctx) { if (ctx.c.state === 'suspended') { try { ctx.c.resume(); } catch (e) { /* 再生できない */ } } return ctx; }
+    try { ctx = make(); } catch (e) { ctx = null; }
+    return ctx;
+  }
+
+  function noise(c) {
+    if (c.__noise) return c.__noise;
+    const len = c.sampleRate;
+    const b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    c.__noise = b;
+    return b;
+  }
+
+  /* 1音: 立ち上がり→減衰。o = { type, vol, a(立ち上がり), r(余韻), to(終わりの周波数), lp(ローパス), vib(ビブラート深さHz), det(うなり) } */
+  function tone(S, freq, t0, dur, o) {
+    o = o || {};
+    const c = S.c, t = (S.base != null ? S.base : c.currentTime + 0.03) + t0;
+    const osc = c.createOscillator(), g = c.createGain();
+    osc.type = o.type || 'square';
+    osc.frequency.setValueAtTime(freq, t);
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    if (o.det) osc.detune.value = o.det;
+    const a = o.a == null ? 0.012 : o.a, r = o.r == null ? 0.08 : o.r, v = (o.vol == null ? 0.2 : o.vol);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(v, t + a);
+    g.gain.setValueAtTime(v, t + Math.max(a, dur - r));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + r);
+    let tail = osc;
+    if (o.lp) {
+      const lp = c.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = o.lp; lp.Q.value = 0.7;
+      osc.connect(lp); tail = lp;
+    }
+    tail.connect(g); g.connect(S.out);
+    if (o.vib) {
+      const l = c.createOscillator(), lg = c.createGain();
+      l.frequency.value = o.vibRate || 5.5; lg.gain.value = o.vib;
+      l.connect(lg); lg.connect(osc.frequency);
+      l.start(t); l.stop(t + dur + r + 0.05);
+    }
+    osc.start(t); osc.stop(t + dur + r + 0.05);
+  }
+  /* 和音 */
+  function chord(S, names, t0, dur, o) {
+    names.forEach(function (n, i) { tone(S, f(n), t0, dur, Object.assign({}, o, { vol: (o.vol || 0.15) / Math.sqrt(names.length) * 1.4 })); });
+  }
+  /* 雑音(ドン、シャラ、など) */
+  function burst(S, t0, dur, o) {
+    o = o || {};
+    const c = S.c, t = (S.base != null ? S.base : c.currentTime + 0.03) + t0;
+    const src = c.createBufferSource(), g = c.createGain(), flt = c.createBiquadFilter();
+    src.buffer = noise(c);
+    flt.type = o.type || 'lowpass'; flt.frequency.setValueAtTime(o.f0 || 800, t);
+    if (o.f1) flt.frequency.exponentialRampToValueAtTime(o.f1, t + dur);
+    g.gain.setValueAtTime(o.vol || 0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(flt); flt.connect(g); g.connect(S.out);
+    src.start(t); src.stop(t + dur + 0.05);
+  }
+  /* きらきら(高い音の連なり) */
+  function sparkle(S, t0, span, count, base) {
+    const pent = ['C6', 'D6', 'E6', 'G6', 'A6', 'C7', 'D7', 'E7'];
+    for (let i = 0; i < count; i++) {
+      const n = pent[(base + i * 3) % pent.length];
+      tone(S, f(n), t0 + (span / count) * i, 0.06, { type: 'sine', vol: 0.07, a: 0.004, r: 0.35 });
+    }
+  }
+  const brass = { type: 'sawtooth', lp: 2400, a: 0.02, r: 0.12, vol: 0.2 };
+
+  const SONGS = {
+    /* 途中エンド: ぽ・ぽ・ぽー(0.45秒) */
+    mid: function (S) {
+      tone(S, f('A4'), 0.00, 0.09, { type: 'triangle', vol: 0.42, r: 0.03 });
+      tone(S, f('F4'), 0.11, 0.09, { type: 'triangle', vol: 0.42, r: 0.03 });
+      tone(S, f('D4'), 0.22, 0.14, { type: 'triangle', vol: 0.44, r: 0.08, to: f('C4') });
+    },
+    /* 敗北: ずしんと沈む(0.9秒) */
+    defeat: function (S) {
+      burst(S, 0.00, 0.22, { f0: 420, f1: 60, vol: 0.5 });
+      tone(S, 150, 0.00, 0.22, { type: 'sine', vol: 0.5, to: 48, r: 0.05 });
+      tone(S, f('E4'), 0.06, 0.62, { type: 'sawtooth', lp: 900, vol: 0.2, to: f('E3'), r: 0.12 });
+      tone(S, f('Bb3'), 0.06, 0.62, { type: 'sawtooth', lp: 700, vol: 0.14, to: f('Bb2'), r: 0.12 });
+    },
+    /* 魔王の手下: 不穏な行進曲 → 間の抜けた「ぽよん」(約4秒) */
+    minion: function (S) {
+      const b = Object.assign({}, brass, { lp: 1500, vol: 0.22 });
+      tone(S, f('D3'), 0.00, 0.22, b);
+      tone(S, f('D3'), 0.30, 0.22, b);
+      tone(S, f('F3'), 0.60, 0.22, b);
+      tone(S, f('E3'), 0.90, 0.22, b);
+      chord(S, ['D3', 'F3', 'A3'], 1.25, 0.8, Object.assign({}, b, { vol: 0.2 }));
+      tone(S, f('A2'), 2.25, 0.9, { type: 'sawtooth', lp: 500, vol: 0.2, vib: 6, vibRate: 7, r: 0.2 });
+      tone(S, f('Eb4'), 2.35, 0.8, { type: 'triangle', vol: 0.1, vib: 5, vibRate: 6, r: 0.2 });
+      tone(S, 320, 3.35, 0.2, { type: 'sine', vol: 0.35, to: 640, r: 0.04 });
+      tone(S, 640, 3.58, 0.2, { type: 'sine', vol: 0.3, to: 380, r: 0.15 });
+    },
+    /* 魔王討伐: 勝利のファンファーレ(約4秒) */
+    victory: function (S) {
+      const b = Object.assign({}, brass);
+      tone(S, f('C5'), 0.00, 0.14, b); tone(S, f('C5'), 0.18, 0.14, b); tone(S, f('C5'), 0.36, 0.14, b);
+      chord(S, ['C5', 'E5', 'G5'], 0.58, 0.55, b);
+      tone(S, f('Bb4'), 1.25, 0.2, b);
+      tone(S, f('C5'), 1.50, 0.2, b);
+      tone(S, f('D5'), 1.75, 0.2, b);
+      chord(S, ['E5', 'G5', 'C6'], 2.05, 0.35, b);
+      chord(S, ['C4', 'E4', 'G4', 'C5', 'E5', 'G5'], 2.55, 1.35, Object.assign({}, b, { vol: 0.24, r: 0.35 }));
+      tone(S, f('C3'), 2.55, 1.35, { type: 'triangle', vol: 0.25, r: 0.3 });
+      sparkle(S, 2.7, 1.1, 9, 0);
+    },
+    /* 最強: 太鼓 → ハープ → 荘厳な和音(約5秒) */
+    supreme: function (S) {
+      for (let i = 0; i < 8; i++) burst(S, i * 0.07, 0.12, { f0: 260, f1: 90, vol: 0.28 + i * 0.03 });
+      burst(S, 0.6, 0.5, { f0: 500, f1: 50, vol: 0.55 });
+      tone(S, 90, 0.6, 0.5, { type: 'sine', vol: 0.5, to: 40, r: 0.1 });
+      const harp = ['C4', 'E4', 'G4', 'C5', 'E5', 'G5', 'C6', 'E6'];
+      harp.forEach(function (n, i) { tone(S, f(n), 0.75 + i * 0.09, 0.2, { type: 'triangle', vol: 0.2, r: 0.4 }); });
+      const b = Object.assign({}, brass, { vol: 0.26 });
+      chord(S, ['G3', 'B3', 'D4', 'G4'], 1.6, 0.45, b);
+      chord(S, ['A3', 'C4', 'E4', 'A4'], 2.1, 0.45, b);
+      chord(S, ['C3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5'], 2.6, 2.2, Object.assign({}, b, { vol: 0.3, r: 0.5, a: 0.05 }));
+      tone(S, f('C6'), 2.7, 2.1, { type: 'sine', vol: 0.12, vib: 4, vibRate: 5.5, r: 0.4 });
+      sparkle(S, 2.7, 2.2, 16, 1);
+    },
+    /* 伝説の旅人: 静かな鐘 → 光が満ちる(約4.6秒) */
+    legend: function (S) {
+      const bell = { type: 'sine', vol: 0.22, a: 0.004, r: 1.2 };
+      tone(S, f('D5'), 0.00, 0.25, bell);
+      tone(S, f('A4'), 0.60, 0.25, bell);
+      tone(S, f('F#5'), 1.20, 0.25, bell);
+      tone(S, f('E5'), 1.80, 0.25, bell);
+      tone(S, f('D3'), 0.0, 2.8, { type: 'sawtooth', lp: 380, vol: 0.12, a: 1.2, r: 0.5, det: -6 });
+      tone(S, f('A3'), 0.4, 2.4, { type: 'sawtooth', lp: 420, vol: 0.1, a: 1.2, r: 0.5, det: 6 });
+      chord(S, ['D4', 'F#4', 'A4', 'D5', 'F#5'], 2.7, 1.7, { type: 'triangle', vol: 0.3, a: 0.25, r: 0.6 });
+      tone(S, f('A5'), 2.8, 1.6, { type: 'sine', vol: 0.12, vib: 3, vibRate: 5, r: 0.5 });
+      sparkle(S, 2.9, 1.5, 10, 2);
+    },
+    /* 逃げて余生: やさしい笛と、爪弾き(約4.2秒) */
+    retire: function (S) {
+      const mel = [['G4', 0.0, 0.5], ['A4', 0.55, 0.3], ['B4', 0.9, 0.5], ['D5', 1.45, 0.7], ['B4', 2.2, 0.4], ['A4', 2.65, 0.4], ['G4', 3.1, 0.9]];
+      mel.forEach(function (m) {
+        tone(S, f(m[0]), m[1], m[2], { type: 'sine', vol: 0.26, a: 0.06, r: 0.2, vib: 3, vibRate: 5 });
+        tone(S, f(m[0]) * 2, m[1], m[2], { type: 'sine', vol: 0.04, a: 0.06, r: 0.2 });
+      });
+      const arp = ['G3', 'D4', 'B3', 'D4'];
+      for (let i = 0; i < 8; i++) tone(S, f(arp[i % 4]), 0.05 + i * 0.5, 0.18, { type: 'triangle', vol: 0.16, a: 0.005, r: 0.45 });
+      chord(S, ['G3', 'D4', 'G4', 'B4'], 3.1, 0.9, { type: 'triangle', vol: 0.2, a: 0.08, r: 0.6 });
+    }
+  };
+
+  /* --- BGM(短い曲を繰り返す。立ち絵から選択までの間だけ鳴る) ---
+     { len: 1周の秒数, pat: function (S) } 。pat は S.base を起点に音を並べる */
+  const BGMS = {
+    /* 関所の門番: 行進曲風、重く、規則的 */
+    gate: { len: 9.6, pat: function (S) {
+      const b = 0.6;
+      const bass = ['D2', 'D2', 'A1', 'A1', 'Bb1', 'Bb1', 'A1', 'A1'];
+      for (let i = 0; i < 16; i++) {
+        tone(S, f(bass[(i >> 1) % 8]), i * b, b * 0.8, { type: 'triangle', vol: 0.22, a: 0.01, r: 0.08 });
+        if (i % 2 === 1) burst(S, i * b, 0.09, { type: 'highpass', f0: 2500, vol: 0.12 });
+        if (i % 4 === 0) tone(S, 70, i * b, 0.12, { type: 'sine', to: 40, vol: 0.3, a: 0.003, r: 0.05 });
+      }
+      const mel = [['D4', 0], ['F4', 1], ['A4', 2], ['F4', 3], ['E4', 4], ['G4', 5], ['A4', 6], ['G4', 7],
+        ['F4', 8], ['A4', 9], ['C5', 10], ['A4', 11], ['A4', 12], ['G4', 13], ['F4', 14], ['E4', 15]];
+      mel.forEach(function (m) { tone(S, f(m[0]), m[1] * b, b * 0.5, { type: 'square', lp: 1800, vol: 0.1, a: 0.01, r: 0.06 }); });
+    } },
+    /* ライバル: ロック風。ドラム、パワーコード、短いリフ */
+    rival: { len: 6.4, pat: function (S) {
+      const b = 0.4;
+      const roots = ['E2', 'E2', 'G2', 'A2'];
+      for (let bar = 0; bar < 4; bar++) {
+        const r = roots[bar], fifth = f(r) * 1.5, oct = f(r) * 2;
+        for (let i = 0; i < 8; i++) {
+          const t = bar * 4 * b + i * b / 2, o = { type: 'sawtooth', lp: 1500, a: 0.004, r: 0.03, vol: 0.13 };
+          const d = (i % 4 === 3) ? b * 0.45 : b * 0.2;     // 休符まじりの刻み
+          tone(S, f(r), t, d, o); tone(S, fifth, t, d, o); tone(S, oct, t, d, o);
+        }
+        for (let k = 0; k < 4; k++) {
+          const t = bar * 4 * b + k * b;
+          if (k % 2 === 0) tone(S, 120, t, 0.14, { type: 'sine', to: 45, vol: 0.5, a: 0.002, r: 0.05 });
+          else burst(S, t, 0.16, { type: 'bandpass', f0: 1800, vol: 0.28 });
+          burst(S, t, 0.04, { type: 'highpass', f0: 6000, vol: 0.1 });
+          burst(S, t + b / 2, 0.04, { type: 'highpass', f0: 6000, vol: 0.08 });
+        }
+      }
+      const riff = [['E4', 0], ['G4', 0.5], ['B4', 1], ['A4', 1.5], ['G4', 2], ['E4', 3], ['G4', 4], ['B4', 4.5], ['D5', 5], ['C5', 5.5], ['B4', 6], ['G4', 7]];
+      riff.forEach(function (n) { tone(S, f(n[0]), n[1] * b * 2, b * 0.9, { type: 'sawtooth', lp: 2600, vol: 0.09, a: 0.01, r: 0.08, vib: 4 }); });
+    } },
+    /* 魔王: 低音の持続音、心音、不協和 */
+    demon: { len: 8, pat: function (S) {
+      tone(S, f('D2'), 0, 4, { type: 'sawtooth', lp: 260, vol: 0.3, a: 0.6, r: 0.6 });
+      tone(S, f('Ab2'), 0, 4, { type: 'sawtooth', lp: 240, vol: 0.18, a: 0.9, r: 0.6, det: 8 });
+      tone(S, f('D2'), 4, 4, { type: 'sawtooth', lp: 300, vol: 0.3, a: 0.4, r: 0.6 });
+      tone(S, f('Eb2'), 4, 4, { type: 'sawtooth', lp: 260, vol: 0.2, a: 0.8, r: 0.6, det: -6 });
+      for (let i = 0; i < 8; i++) {
+        tone(S, 62, i, 0.18, { type: 'sine', to: 38, vol: 0.5, a: 0.004, r: 0.1 });
+        tone(S, 62, i + 0.22, 0.14, { type: 'sine', to: 38, vol: 0.32, a: 0.004, r: 0.1 });
+      }
+      tone(S, f('A5'), 3.2, 0.8, { type: 'sine', vol: 0.04, a: 0.3, r: 0.4, vib: 6, vibRate: 5 });
+      tone(S, f('Bb5'), 7.2, 0.8, { type: 'sine', vol: 0.04, a: 0.3, r: 0.4, vib: 6, vibRate: 5 });
+      [0, 4].forEach(function (t) { burst(S, t + 3.5, 0.45, { type: 'lowpass', f0: 200, f1: 60, vol: 0.2 }); });
+    } }
+  };
+  let bgm = null;
+  function bgmStop() {
+    if (!bgm) return;
+    const b = bgm; bgm = null;
+    clearInterval(b.timer);
+    try {
+      const t = b.S.c.currentTime;
+      b.gain.gain.cancelScheduledValues(t);
+      b.gain.gain.setValueAtTime(b.gain.gain.value, t);
+      b.gain.gain.linearRampToValueAtTime(0.0001, t + 0.15);
+      setTimeout(function () { try { b.gain.disconnect(); } catch (e) { /* すでに切れている */ } }, 400);
+    } catch (e) { /* 止められなくても、ゲームは続ける */ }
+  }
+  function bgmStart(kind) {
+    bgmStop();
+    if (!on || !BGMS[kind]) return;
+    const S0 = ensure();
+    if (!S0) return;
+    try {
+      const c = S0.c, gain = c.createGain();
+      gain.gain.setValueAtTime(0.0001, c.currentTime);
+      gain.gain.linearRampToValueAtTime(0.6, c.currentTime + 0.08);
+      gain.connect(S0.out);
+      const S = { c: c, out: gain, base: null }, def = BGMS[kind];
+      let next = c.currentTime + 0.05;
+      const sched = function () { while (next < c.currentTime + 1.2) { S.base = next; def.pat(S); next += def.len; } };
+      sched();
+      bgm = { S: S, gain: gain, timer: setInterval(sched, 250) };
+    } catch (e) { bgm = null; }
+  }
+  const LENGTH = { mid: 0.45, defeat: 0.9, minion: 4.0, victory: 4.1, supreme: 5.0, legend: 4.6, retire: 4.2 };
+
+  return {
+    kinds: Object.keys(SONGS),
+    length: function (k) { return LENGTH[k] || 0; },
+    isOn: function () { return on; },
+    /* 「ピッ」: エンドにならない選択と、メッセージを先へ送る時の音 */
+    beep: function () {
+      if (!on) return;
+      const S = ensure();
+      if (!S) return;
+      try { tone(S, f('A6'), 0, 0.045, { type: 'square', vol: 0.09, a: 0.002, r: 0.025 }); } catch (e) { /* 鳴らなくても続ける */ }
+    },
+    bgm: bgmStart,
+    bgmStop: bgmStop,
+    bgmKinds: Object.keys(BGMS),
+    bgmLength: function (k) { return BGMS[k] ? BGMS[k].len : 0; },
+    _renderBgm: function (kind, seconds) {
+      const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      const oc = new OAC(1, 44100 * seconds, 44100);
+      const S = make(oc); S.base = 0.03;
+      BGMS[kind].pat(S);
+      return oc.startRendering();
+    },
+    setOn: function (v) {
+      on = !!v;
+      if (!on) bgmStop();
+      try { localStorage.setItem(KEY, on ? 'on' : 'off'); } catch (e) { /* 保存できなくても動く */ }
+      if (on) ensure();
+    },
+    /* 最初のタップで呼ぶ。ブラウザは、操作の後でないと音を出せないため */
+    unlock: function () { if (on) ensure(); },
+    play: function (kind, force) {
+      if (!on && !force) return;
+      const S = ensure();
+      if (!S || !SONGS[kind]) return;
+      try { SONGS[kind](S); } catch (e) { /* 音が鳴らなくても、ゲームは続ける */ }
+    },
+    /* 書き出し用(検証): 指定の種類を OfflineAudioContext に描く */
+    _render: function (kind, seconds) {
+      const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      const oc = new OAC(1, 44100 * seconds, 44100);
+      const S = make(oc);
+      SONGS[kind](S);
+      return oc.startRendering();
+    }
+  };
+})();
