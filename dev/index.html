@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>開発者モード｜3秒即断RPG</title>
+<meta name="description" content="開発者用ページ">
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>html{background:#e8ebf6}@media (prefers-color-scheme:dark){html{background:#0e1124}}</style>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main class="app dev-box" data-root="../" data-h="e98ab0531cdcb0baad9647dc7e0e029743ef47ef0f7aacac50716c4fa657b4e5">
+  <header class="top"><a class="brand-link" href="../index.html"><h1 class="brand">3秒即断RPG<small>(仮)</small></h1></a><a class="collect" href="../index.html">遊ぶ</a></header>
+  <section id="gate"><h2>開発者モード</h2>
+    <form id="gateForm" class="form" autocomplete="off"><label>パスワード<input type="password" id="gatePw" autocomplete="off"></label><p class="form-msg ng" id="gateMsg" hidden></p><button class="btn primary" type="submit">入る</button></form></section>
+  <section id="tools" hidden>
+    <div class="codex-head"><h2>開発者モード</h2><button class="btn small" id="devLogout" type="button">終了</button></div>
+    <div class="tabs" role="tablist"><button class="tab" data-t="ends" role="tab">エンド直前から</button><button class="tab" data-t="sim" role="tab">判定の一覧</button><button class="tab" data-t="trace" role="tab">直近の記録</button><button class="tab" data-t="sound" role="tab">効果音</button><button class="tab" data-t="data" role="tab">図鑑・バッジ</button></div>
+    <div class="pane" id="pane-ends">
+      <p class="dev-note">「直前から」を押すと、そのエンドの手前の場面から始まります。印の付いた選択肢(または時間切れ)で、そのエンドに着きます。</p>
+      <div class="dev-row"><label><input type="checkbox" id="optRec"> 図鑑に記録する(バッジの確認用)</label><label><input type="checkbox" id="optNoTimer"> タイマーを止める</label></div>
+      <div id="endList"></div>
+    </div>
+    <div class="pane" id="pane-sim" hidden>
+      <p class="dev-note">状態を入力すると、そのカードの全ての選択肢の結果が、実際の判定で一覧になります。</p>
+      <div id="simBox"><label>カード <select id="simCard"></select></label><div class="sim-state" id="simState"></div><div id="simOut"></div></div>
+    </div>
+    <div class="pane" id="pane-trace" hidden><div id="traceOut"></div></div>
+    <div class="pane" id="pane-sound" hidden><p class="dev-note">端末の音量とマナーモードにご注意ください。</p><ul class="sound-list" id="soundList"></ul></div>
+    <div class="pane" id="pane-data" hidden>
+      <p class="dev-note">この端末の図鑑データを書き換えます(元に戻せます)。バッジの確認用です。</p>
+      <p id="dataNow"></p>
+      <div class="dev-row"><label>図鑑を <input type="number" id="dataN" min="0" max="44" value="4" style="width:5em"> 件にする(No.047を除く)</label><button class="btn small" id="dataSet" type="button">設定</button></div>
+      <div class="dev-row"><button class="btn small" id="dataAll" type="button">全エンド到達済みにする</button><button class="btn small" id="dataClear" type="button">全て消す</button><button class="btn small" id="dataRestore" type="button">元に戻す</button></div>
+      <p class="dev-note">例: 4件にして、「エンド直前から」で図鑑に記録する設定のまま No.047 を選ぶと、5件目でバッジ(B05)の通知が確認できます。</p>
+    </div>
+  </section>
+  <footer class="foot"><nav><a href="../privacy/index.html">プライバシーポリシー</a><a href="../contact/index.html">お問い合わせ</a><a class="lang-sw" href="../en/dev/index.html" hreflang="en" lang="en">English</a></nav><small>© 2026 3秒即断RPG</small></footer>
+</main>
+<script src="../lang.js"></script>
+<script src="../engine.js"></script>
+<script src="../common.js"></script>
+<script src="../sound.js"></script>
+<script src="../devlib.js"></script>
+<script src="../portraits.js"></script>
+<script src="../devpage.js"></script>
+</body>
+</html>
