@@ -33,6 +33,18 @@ const COMMON = (function () {
   }
   migrate();
 
+  /* 「遊ぶ」を押したら、開発者モードを解除する(直前の動作確認の場面へ飛ばないように) */
+  if (typeof document.addEventListener === 'function') document.addEventListener('click', function (ev) {
+    try {
+      if (!devOn()) return;
+      const a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
+      if (!a) return;
+      const u = new URL(a.getAttribute('href'), location.href), home = new URL(homeUrl(), location.href);
+      const norm = function (x) { return x.pathname.replace(/index\.html$/, ''); };
+      if (u.origin === home.origin && norm(u) === norm(home)) setDev(false);
+    } catch (e) { /* 判定できなければ、何もしない */ }
+  }, true);
+
   function read(key) {
     try { const raw = localStorage.getItem(key); if (raw) return JSON.parse(raw); } catch (e) { /* 保存できない環境 */ }
     return null;

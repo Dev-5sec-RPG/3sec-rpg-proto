@@ -141,17 +141,15 @@
       b.addEventListener('click', function () {
         if (done || performance.now() < readyAt) return;
         done = true; stopTimer(); lock();
-        SFX.bgmStop();
         mark(b, true);
         /* onPick は、エンドにならない時だけ「次の処理」を返す。その場合は、少し止めてから進む */
         const next = o.onPick(Number(b.getAttribute('data-i')));
-        if (typeof next === 'function') { SFX.beep(); setTimeout(next, FREEZE_MS); } else mark(b, false);
+        if (typeof next === 'function') setTimeout(next, FREEZE_MS); else mark(b, false);
       });
     });
     function expire() {
       if (done) return;
       done = true; lock();
-      SFX.bgmStop();
       o.onTimeout();
     }
     if (o.mark != null && o.mark >= 0) {
@@ -169,7 +167,7 @@
     stage.innerHTML = html + '<button class="btn next" id="nextBtn">' + label + '</button>';
     readyAt = performance.now() + 180;
     function go() {
-      if (performance.now() < readyAt) return;
+      if (cutLock || performance.now() < readyAt) return;     // カットイン中は、先へ進めない
       SFX.beep();
       onNext();
     }
@@ -198,8 +196,10 @@
 
   /* カットイン: 0.1秒でフェードインしながら右から入り、表示したあと、0.1秒でフェードアウトしながら左へ抜ける。
      表示時間は、関所・ライバルが0.5秒(計0.7秒)、魔王が0.8秒(計1.0秒)。立ち絵以外は透明 */
+  let cutLock = false;
   const CUT_IN_MS = 100, CUT_OUT_MS = 100, CUT_HOLD_MS = { B: 500, C: 500, D: 800 };
   function cutIn(svg, done, id) {
+    cutLock = true;
     SFX.bgm({ B: 'gate', C: 'rival', D: 'demon' }[id]);
     const hold = CUT_HOLD_MS[id] || 500;
     const el = document.createElement('div');
@@ -208,7 +208,7 @@
     el.innerHTML = svg;
     document.body.appendChild(el);
     let finished = false;
-    function end() { if (finished) return; finished = true; if (el.parentNode) el.parentNode.removeChild(el); done(); }
+    function end() { if (finished) return; finished = true; cutLock = false; if (el.parentNode) el.parentNode.removeChild(el); done(); }
     requestAnimationFrame(function () { el.classList.add('on'); });
     setTimeout(function () { el.classList.remove('on'); el.classList.add('out'); }, CUT_IN_MS + hold);
     setTimeout(end, CUT_IN_MS + hold + CUT_OUT_MS);
@@ -216,6 +216,7 @@
 
   function showQuestion(card, stage) {
     stage = stage || 1;
+    curCard = card;
     const boss = card.id === 'D';
     const list = stage === 2 ? card.choices2 : card.choices;   // ランダムに選ばれた選択肢は、進行表を作る時に決まっている
     const who = boss ? tx('{w}({n}回目)', { w: card.who, n: stage }) : card.who;
@@ -232,16 +233,33 @@
         const out = boss ? G.resolveBoss(run, card, stage, choice, rr) : G.resolveChoice(run, card, choice, rr);
         const meta = { who: who, label: choice.label, rng: used };
         const after = out.next ? function () { showQuestion(card, 2); } : null;
+        feedback(out);
         if (out.end) { finishStep(out, after, meta); return; }          // エンドへは、止めずに進む
         return function () { finishStep(out, after, meta); };            // それ以外は、選べたことを確認させてから進む
       },
       onTimeout: function () {
         run.history.push({ who: who, text: tx('(時間切れ)') });
-        finishStep(G.resolveTimeout(run, card), null, { who: who, label: tx('(時間切れ)') });
+        const out = G.resolveTimeout(run, card);
+        feedback(out, true);
+        finishStep(out, null, { who: who, label: tx('(時間切れ)') });
       }
     });
   }
 
+  /* 選択の直後の音: いい効果が多ければ「上がる3音」。悪い効果が多い・効果なし・時間切れは「下がる3音」。エンドへ向かう時は鳴らさない */
+  function feedback(out, timedOut) {
+    if (out.end) return;
+    let good = 0, bad = 0;
+    if (out.fx) Object.keys(out.fx).forEach(function (k) { if (out.fx[k] > 0) good += out.fx[k]; else bad -= out.fx[k]; });
+    const gold = (typeof out.gold === 'number') ? out.gold : 0;
+    if (gold > 0) good += 1; else if (gold < 0) bad += 1;
+    if (out.items || out.ally) good += 1;
+    if (out.loseAlly || out.loseAllAllies || out.loseEquip || out.loseSlot) bad += 1;
+    SFX.play(!timedOut && good > bad ? 'rise' : 'fall');
+  }
+
+  /* 場面とBGM: 関所のあとは城下町、ライバルのあとは暗い曲(次の立ち絵で、その場面の曲に替わる) */
+  let curCard = null;
   function finishStep(out, after, meta) {
     const before = DEV ? DEV.snap(run) : null;
     G.applyOutcome(run, out);
@@ -250,6 +268,8 @@
     setPurse(run.money, out.goldDelta);
     setGear();
     if (out.end) { leave(out.end, out.why); return; }
+    if (curCard && curCard.id === 'B') SFX.bgm('town');
+    else if (curCard && curCard.id === 'C') SFX.bgm('dusk');
     const parts = STATS.filter(function (s) { return out.fx && out.fx[s.key]; }).map(function (s) {
       return [s.label, out.fx[s.key]];
     });
@@ -323,7 +343,7 @@
       who: null, q: tx('始めますか。'), shuffle: false, labels: [tx('始める'), tx('始めない')],
       mark: (DEV && C.devPreset() && C.devPreset().pick) ? ['始める', '始めない'].indexOf(C.devPreset().pick) : -1,
       onPick: function (i) {
-        if (i === 0) { run.history.push({ who: 'A', text: tx('始める') }); return function () { showStory(0); }; }
+        if (i === 0) { run.history.push({ who: 'A', text: tx('始める') }); SFX.play('rise'); SFX.bgm('field'); return function () { showStory(0); }; }
         run.history.push({ who: 'A', text: tx('始めない') });
         leave('999');
       },
@@ -339,6 +359,7 @@
     if (leaving) return;
     leaving = true;
     stopTimer();
+    SFX.bgmStop();
     const e = ENDS[code];
     const record = !(DEV && !DEV.record);          // 開発者モードでは、図鑑に記録しないことも選べる
     let cx = C.loadCodex(), isNew = false, fresh = [];

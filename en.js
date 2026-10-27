@@ -576,5 +576,6 @@ const EN_DICT = {
  "渾身の歌声が、天に突き抜けた。鳥が落ち、雲が割れた。\n愛嬌と引き換えに、投げ銭は、なぜか多かった。": "Your all-out voice pierced the heavens. Birds fell and the clouds parted.\nIn exchange for your Charm, the tips were, strangely, generous.",
  "深い眠りの底で、何かが零れ落ちていった。\n起きたら、その場しのぎの術まで忘れていた。": "At the bottom of a deep sleep, something slipped away.\nWhen you woke, you had even forgotten how to think on your feet.",
  "飲んだ瞬間、怖いものがなくなった。\n同時に、口がうまく回らなくなった。": "The moment you drank, nothing scared you anymore.\nAt the same time, your tongue stopped working properly.",
- "このゲームの記録は、端末内にだけ保存されます。\nブラウザのデータを消去すると、図鑑とバッジも消えます。": "Your records in this game are stored only on this device.\nIf you clear your browser data, your codex and badges will be erased too."
+ "このゲームの記録は、端末内にだけ保存されます。\nブラウザのデータを消去すると、図鑑とバッジも消えます。": "Your records in this game are stored only on this device.\nIf you clear your browser data, your codex and badges will be erased too.",
+ "助けを呼ぶと、あの時の旅人が現れた。\n魔王は、旅人の一撃で仕留められた。\n80銀貨は、さすがに払えなかったが。": "When you called for help, the traveler from before appeared.\nThe Demon King was finished off with a single blow from the traveler.\nYou still couldn't pay the 80 silver, of course."
 };

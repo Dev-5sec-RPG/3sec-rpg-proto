@@ -77,7 +77,9 @@
   /* --- ① 各エンドの直前から始める --- */
   function optGet() { try { return JSON.parse(sessionStorage.getItem('sansec_dev_opt_v1') || '{}'); } catch (e) { return {}; } }
   function optSet(o) { try { sessionStorage.setItem('sansec_dev_opt_v1', JSON.stringify(Object.assign(optGet(), o))); } catch (e) { /* 保存できない環境 */ } }
-  const KIND = { mid: '途中', defeat: '敗北', minion: '手下', victory: '討伐', supreme: '最強', legend: '伝説', retire: '余生' };
+  const KIND = { mid: '途中', defeat: '敗北', minion: '手下', victory: '討伐', supreme: '最強', legend: '伝説', retire: '余生', rise: '選択(良)', fall: '選択(悪)', badgeAll: 'バッジ(全)' };
+  const KNOTE = { rise: '選択:いい効果が多い', fall: '選択:悪い効果が多い・効果なし・時間切れ', badgeAll: 'バッジ:全エンド収集(それ以外のバッジは「討伐」と同じ)' };
+  const BGMNOTE = { field: 'はじまり〜関所(晴れやか)', gate: '関所の門番', town: '関所のあと〜ライバル(城下町)', rival: 'ライバル(ロック風)', dusk: 'ライバルのあと〜魔王(暗め)', demon: '魔王(1回目〜2回目)' };
   function initEnds() {
     const o = optGet();
     const rec = $('#optRec');
@@ -172,11 +174,22 @@
   function initSound() {
     $('#soundList').innerHTML = SFX.kinds.map(function (k) {
       const names = Object.keys(G.ENDS).filter(function (c) { return G.ENDS[c].sfx === k; });
-      return '<li><button class="btn small" data-snd="' + k + '" type="button">▶ ' + KIND[k] + '</button><span>約' + SFX.length(k) + '秒 ／ No.' + names.join('・') + '</span></li>';
-    }).join('');
+      return '<li><button class="btn small" data-snd="' + k + '" type="button">▶ ' + KIND[k] + '</button><span>約' + SFX.length(k) + '秒 ／ ' + (KNOTE[k] || 'No.' + names.join('・')) + '</span></li>';
+    }).join('') + '<li><button class="btn small" data-beep="1" type="button">▶ ピッ</button><span>メッセージを送る時</span></li>';
+    $('#bgmList').innerHTML = SFX.bgmKinds.map(function (k) {
+      return '<li><button class="btn small" data-bgm="' + k + '" type="button">▶ ' + k + '</button><span>約' + SFX.bgmLength(k).toFixed(1) + '秒のループ ／ ' + BGMNOTE[k] + '</span></li>';
+    }).join('') + '<li><button class="btn small" data-bgm="" type="button">■ 停止</button><span>BGMを止める</span></li>';
+    $('#bgmList').addEventListener('click', function (ev) {
+      const b = ev.target.closest('[data-bgm]');
+      if (!b) return;
+      SFX.unlock();
+      const k = b.getAttribute('data-bgm');
+      if (k) SFX.bgm(k, true); else SFX.bgmStop();
+    });
     $('#soundList').addEventListener('click', function (ev) {
       const b = ev.target.closest('[data-snd]');
       if (b) { SFX.unlock(); SFX.play(b.getAttribute('data-snd'), true); }
+      if (ev.target.closest('[data-beep]')) { SFX.unlock(); SFX.beep(true); }
     });
   }
 

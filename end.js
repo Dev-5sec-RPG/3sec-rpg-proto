@@ -109,6 +109,7 @@
   function badgePrompt() {
     const ids = (lastRun.badges || []).filter(function (id) { return G.BADGES.some(function (b) { return b.id === id; }); });
     if (!ids.length) return;
+    SFX.play(ids.indexOf('BALL') >= 0 ? 'badgeAll' : 'victory');   // バッジのファンファーレ(全て集めた時だけ別の曲)
     lastRun.badgePrompted = true; C.saveLast(lastRun);
     const bd = C.loadBadges();
     ids.forEach(function (id) { if (bd[id]) bd[id].notified = true; });
@@ -135,6 +136,7 @@
       location.href = ids.length === 1 ? C.badgeUrl(ids[0]) : C.codexUrl() + '#badges';
     });
   }
+  document.addEventListener('pointerdown', function () { SFX.unlock(); }, true);
   if (lastRun && !lastRun.dev && lastRun.badges && lastRun.badges.length && !lastRun.badgePrompted) {
     setTimeout(badgePrompt, 3000);
   }
