@@ -145,7 +145,7 @@
   const camBtn = document.getElementById('camBtn');
   const FONT = "'DotGothic16','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif";
   const W = 1080, H = 1350;
-  const FXCOL = { victory: '240,192,80', supreme: '255,214,102', legend: '127,216,255', minion: '200,60,90', retire: '255,178,107' };
+  const FXCOL = { victory: '240,192,80', supreme: '255,214,102', legend: '127,216,255', minion: '200,60,90', retire: '255,178,107', peace: '120,210,140' };
   const COL = { bg: '#0e1124', panel: '#171b3a', line: '#4a5399', ink: '#e9ecfb', soft: '#98a2d2', gold: '#f0c050', bad: '#ff7a8e' };
 
   function wrap(ctx, text, maxW) {

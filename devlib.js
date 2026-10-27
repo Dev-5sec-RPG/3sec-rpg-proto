@@ -99,6 +99,7 @@ const DEVLIB = (function () {
   put('041', 'D', '奥義を使う', { equip: ['w3', 'a2'], stats: STRONG }, { stage: 2 });
   put('042', 'D', '奥義を使う', { equip: ['w3', 'a2'], stats: STRONG, allies: ['strong'] }, { stage: 2 });
   put('043', 'D', '助けを呼ぶ', { flags: { metMax: true } }, { stage: 2 });
+  put('044', 'D', 'カツアゲされる', { money: 20 });
 
   /* 場面の「初期状態」を、短い文にする */
   function stateText(sc) {

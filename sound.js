@@ -121,6 +121,42 @@ const SFX = (function () {
     fall: function (S) {
       ['G5', 'E5', 'C5'].forEach(function (n, i) { tone(S, f(n), i * 0.075, 0.07, { type: 'square', lp: 1800, vol: 0.14, a: 0.004, r: 0.05 }); });
     },
+    /* 伝説の旅人への選択: 「下がる3音」の音色を、少しだけ変えたもの(約0.45秒) */
+    legendPick: function (S) {
+      ['G5', 'E5', 'C5'].forEach(function (n, i) {
+        tone(S, f(n), i * 0.075, 0.09, { type: 'triangle', lp: 2600, vol: 0.15, a: 0.004, r: 0.12 });
+        tone(S, f(n) * 2, i * 0.075 + 0.02, 0.06, { type: 'sine', vol: 0.04, a: 0.004, r: 0.2 });
+      });
+    },
+    /* 和平条約エンド: 硬貨の音と、はずむ金管(約4.2秒) */
+    peace: function (S) {
+      const b = Object.assign({}, brass, { lp: 2200, vol: 0.2 });
+      ['B6', 'E7', 'B6', 'E7'].forEach(function (n, i) { tone(S, f(n), i * 0.11, 0.05, { type: 'sine', vol: 0.09, a: 0.003, r: 0.35 }); });
+      [['C4', 'E4', 'G4'], ['G3', 'B3', 'D4'], ['A3', 'C4', 'E4'], ['F3', 'A3', 'C4']].forEach(function (c, i) {
+        chord(S, c, 0.6 + i * 0.4, 0.22, b);
+        tone(S, f(c[0]) / 2, 0.6 + i * 0.4, 0.22, { type: 'triangle', vol: 0.22, r: 0.06 });
+      });
+      tone(S, f('C5'), 2.3, 0.15, b); tone(S, f('E5'), 2.5, 0.15, b); tone(S, f('G5'), 2.7, 0.15, b);
+      chord(S, ['C4', 'E4', 'G4', 'C5', 'E5'], 2.95, 1.2, Object.assign({}, b, { vol: 0.24, r: 0.35 }));
+      tone(S, f('C3'), 2.95, 1.2, { type: 'triangle', vol: 0.26, r: 0.3 });
+      ['E6', 'G6', 'B6', 'E7', 'G7'].forEach(function (n, i) { tone(S, f(n), 3.0 + i * 0.16, 0.06, { type: 'sine', vol: 0.07, a: 0.003, r: 0.4 }); });
+    },
+    /* 遭遇: ザッ、ザッ、という足音(約0.4秒) */
+    steps: function (S) {
+      [0, 0.17].forEach(function (t, i) {
+        burst(S, t, 0.1, { type: 'bandpass', f0: i ? 650 : 800, f1: 300, vol: 0.8 });
+        tone(S, i ? 90 : 105, t, 0.08, { type: 'sine', to: 55, vol: 0.28, a: 0.003, r: 0.04 });
+      });
+    },
+    /* モンスターとの遭遇: 低く不協和な一撃と、迫る音(約0.7秒) */
+    alert: function (S) {
+      tone(S, f('D3'), 0.00, 0.5, { type: 'sawtooth', lp: 900, vol: 0.24, a: 0.01, r: 0.15, to: f('D3') * 0.97 });
+      tone(S, f('Ab3'), 0.00, 0.5, { type: 'sawtooth', lp: 800, vol: 0.2, a: 0.01, r: 0.15, to: f('Ab3') * 0.97 });
+      burst(S, 0.00, 0.3, { type: 'lowpass', f0: 300, f1: 80, vol: 0.45 });
+      tone(S, f('E5'), 0.30, 0.08, { type: 'square', lp: 2400, vol: 0.12, a: 0.003, r: 0.04 });
+      tone(S, f('Bb5'), 0.40, 0.08, { type: 'square', lp: 2400, vol: 0.12, a: 0.003, r: 0.04 });
+      burst(S, 0.30, 0.35, { type: 'highpass', f0: 1500, f1: 6000, vol: 0.12 });
+    },
     /* バッジ(全エンド収集): 明るいファンファーレ(約4.2秒) */
     badgeAll: function (S) {
       const b = Object.assign({}, brass, { vol: 0.2 });
@@ -243,19 +279,27 @@ const SFX = (function () {
         tone(S, f(n[0]), n[1] * b, n[2] * b * 0.85, { type: 'square', lp: 2600, vol: 0.1, a: 0.008, r: 0.05 });
       });
     } },
-    /* ライバルのあと〜魔王: 暗い雰囲気、ゆっくり(イ短調。72拍/分、3小節で10秒) */
+    /* ライバルのあと〜魔王の前(モンスターの区間): 暗く、速い。魔王の曲より、音数を抑えた(イ短調。120拍/分、5小節で10秒) */
     dusk: { len: 10, pat: function (S) {
-      const b = 0.8333;
-      const ch = [['A2', 'C3', 'E3'], ['F2', 'A2', 'C3'], ['E2', 'G#2', 'B2']];
-      ch.forEach(function (c, bar) {
-        const t = bar * 4 * b;
-        chord(S, c, t, 3.8 * b, { type: 'triangle', lp: 900, vol: 0.14, a: 0.7, r: 0.5 });
-        tone(S, f(c[0]) / 2, t, 3.9 * b, { type: 'sawtooth', lp: 220, vol: 0.2, a: 0.3, r: 0.4 });
-        tone(S, 58, t, 0.16, { type: 'sine', to: 38, vol: 0.32, a: 0.004, r: 0.08 });
-        tone(S, 58, t + 1.5 * b, 0.14, { type: 'sine', to: 38, vol: 0.22, a: 0.004, r: 0.08 });
+      const b = 0.5;
+      const bars = [
+        { r: 'A1', arp: ['A3', 'C4', 'E4', 'C4'] },
+        { r: 'A1', arp: ['A3', 'C4', 'E4', 'C4'] },
+        { r: 'Bb1', arp: ['Bb2', 'D3', 'F3', 'D3'] },
+        { r: 'G2', arp: ['G3', 'B3', 'D4', 'B3'] },
+        { r: 'E2', arp: ['E3', 'G#3', 'B3', 'G#3'] }
+      ];
+      bars.forEach(function (bar, i) {
+        const t = i * 4 * b;
+        tone(S, f(bar.r), t, 4 * b * 0.98, { type: 'sawtooth', lp: 260, vol: 0.26, a: 0.12, r: 0.2 });
+        for (let k = 0; k < 8; k++) tone(S, f(bar.arp[k % 4]) * (k >= 4 ? 2 : 1), t + k * b / 2, b * 0.4, { type: 'sawtooth', lp: 900, vol: 0.07, a: 0.004, r: 0.04 });
+        for (let k = 0; k < 4; k++) tone(S, 105, t + k * b, 0.13, { type: 'sine', to: 42, vol: 0.4, a: 0.003, r: 0.06 });
+        [1, 3].forEach(function (k) { burst(S, t + k * b, 0.13, { type: 'bandpass', f0: 1000, vol: 0.2 }); });
+        for (let k = 0; k < 8; k++) burst(S, t + k * b / 2, 0.02, { type: 'highpass', f0: 7500, vol: 0.03 });
       });
-      [['E5', 0, 2], ['C5', 2, 1], ['B4', 3, 1], ['A4', 4, 2], ['C5', 6, 2], ['G#4', 8, 2], ['B4', 10, 1], ['E5', 11, 1]].forEach(function (n) {
-        tone(S, f(n[0]), n[1] * b, n[2] * b * 0.95, { type: 'sine', vol: 0.13, a: 0.08, r: 0.25, vib: 4, vibRate: 5 });
+      [['E5', 0, 2], ['D5', 2, 1], ['C5', 3, 1], ['Bb4', 4, 2], ['A4', 6, 2], ['D5', 8, 2], ['C5', 10, 1], ['Bb4', 11, 1],
+        ['B4', 12, 2], ['D5', 14, 1], ['E5', 15, 1], ['G#4', 16, 2], ['B4', 18, 2]].forEach(function (n) {
+        tone(S, f(n[0]), n[1] * b, n[2] * b * 0.95, { type: 'triangle', lp: 2600, vol: 0.1, a: 0.01, r: 0.1, vib: 4, vibRate: 5.5 });
       });
     } },
     /* 関所の門番: 行進曲風、重く、規則的 */
@@ -293,19 +337,31 @@ const SFX = (function () {
       const riff = [['E4', 0], ['G4', 0.5], ['B4', 1], ['A4', 1.5], ['G4', 2], ['E4', 3], ['G4', 4], ['B4', 4.5], ['D5', 5], ['C5', 5.5], ['B4', 6], ['G4', 7]];
       riff.forEach(function (n) { tone(S, f(n[0]), n[1] * b * 2, b * 0.9, { type: 'sawtooth', lp: 2600, vol: 0.09, a: 0.01, r: 0.08, vib: 4 }); });
     } },
-    /* 魔王: 低音の持続音、心音、不協和 */
-    demon: { len: 8, pat: function (S) {
-      tone(S, f('D2'), 0, 4, { type: 'sawtooth', lp: 260, vol: 0.3, a: 0.6, r: 0.6 });
-      tone(S, f('Ab2'), 0, 4, { type: 'sawtooth', lp: 240, vol: 0.18, a: 0.9, r: 0.6, det: 8 });
-      tone(S, f('D2'), 4, 4, { type: 'sawtooth', lp: 300, vol: 0.3, a: 0.4, r: 0.6 });
-      tone(S, f('Eb2'), 4, 4, { type: 'sawtooth', lp: 260, vol: 0.2, a: 0.8, r: 0.6, det: -6 });
-      for (let i = 0; i < 8; i++) {
-        tone(S, 62, i, 0.18, { type: 'sine', to: 38, vol: 0.5, a: 0.004, r: 0.1 });
-        tone(S, 62, i + 0.22, 0.14, { type: 'sine', to: 38, vol: 0.32, a: 0.004, r: 0.1 });
-      }
-      tone(S, f('A5'), 3.2, 0.8, { type: 'sine', vol: 0.04, a: 0.3, r: 0.4, vib: 6, vibRate: 5 });
-      tone(S, f('Bb5'), 7.2, 0.8, { type: 'sine', vol: 0.04, a: 0.3, r: 0.4, vib: 6, vibRate: 5 });
-      [0, 4].forEach(function (t) { burst(S, t + 3.5, 0.45, { type: 'lowpass', f0: 200, f1: 60, vol: 0.2 }); });
+    /* 魔王: 少し遅いが、音数が多く、重い(二短調。100拍/分、4小節で9.6秒) */
+    demon: { len: 9.6, pat: function (S) {
+      const b = 0.6, s16 = b / 4;
+      const bars = [
+        { r: 'D2', arp: ['D3', 'F3', 'A3', 'F3'] },
+        { r: 'Bb1', arp: ['Bb2', 'D3', 'F3', 'D3'] },
+        { r: 'G2', arp: ['G3', 'Bb3', 'Eb4', 'Bb3'] },
+        { r: 'A1', arp: ['A2', 'C#3', 'E3', 'G3'] }
+      ];
+      bars.forEach(function (bar, i) {
+        const t = i * 4 * b;
+        tone(S, f(bar.r), t, 4 * b * 0.98, { type: 'sawtooth', lp: 260, vol: 0.26, a: 0.15, r: 0.2 });
+        for (let k = 0; k < 16; k++) tone(S, f(bar.arp[k % 4]) * (k % 8 >= 4 ? 2 : 1), t + k * s16, s16 * 0.8, { type: 'sawtooth', lp: 1000, vol: 0.06, a: 0.004, r: 0.03 });
+        for (let k = 0; k < 4; k++) {
+          tone(S, 100, t + k * b, 0.14, { type: 'sine', to: 40, vol: 0.42, a: 0.003, r: 0.06 });
+          tone(S, 100, t + k * b + 0.2, 0.1, { type: 'sine', to: 40, vol: 0.2, a: 0.003, r: 0.05 });
+        }
+        [1, 3].forEach(function (k) { burst(S, t + k * b, 0.14, { type: 'bandpass', f0: 900, vol: 0.2 }); });
+        [0, 2.5].forEach(function (k) { chord(S, [bar.arp[0], bar.arp[1], bar.arp[2]].map(function (n) { return n.replace(/(\d)$/, function (m, d) { return String(Number(d) + 1); }); }), t + k * b, b * 0.35, { type: 'sawtooth', lp: 1500, vol: 0.2, a: 0.01, r: 0.05 }); });
+        for (let k = 0; k < 8; k++) burst(S, t + k * b / 2, 0.02, { type: 'highpass', f0: 7500, vol: 0.035 });
+      });
+      [['A5', 0, 1], ['Ab5', 1, 1], ['G5', 2, 2], ['F5', 4, 1], ['E5', 5, 1], ['F5', 6, 2],
+        ['Eb5', 8, 1], ['D5', 9, 1], ['Eb5', 10, 1], ['G5', 11, 1], ['A5', 12, 1], ['Bb5', 13, 1], ['A5', 14, 1], ['C#6', 15, 1]].forEach(function (n) {
+        tone(S, f(n[0]), n[1] * b, n[2] * b * 0.9, { type: 'triangle', lp: 3000, vol: 0.1, a: 0.01, r: 0.1, vib: 4, vibRate: 5.5 });
+      });
     } }
   };
   let bgm = null, want = null;
@@ -342,7 +398,7 @@ const SFX = (function () {
       bgm = { kind: kind, S: S, gain: gain, timer: setInterval(sched, 250) };
     } catch (e) { bgm = null; }
   }
-  const LENGTH = { mid: 0.7, defeat: 0.95, rise: 0.3, fall: 0.3, badgeAll: 4.2, minion: 4.0, victory: 4.1, supreme: 5.0, legend: 4.6, retire: 4.2 };
+  const LENGTH = { mid: 0.7, defeat: 0.95, rise: 0.3, fall: 0.3, steps: 0.4, alert: 0.7, peace: 4.2, legendPick: 0.45, badgeAll: 4.2, minion: 4.0, victory: 4.1, supreme: 5.0, legend: 4.6, retire: 4.2 };
 
   return {
     kinds: Object.keys(SONGS),

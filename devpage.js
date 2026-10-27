@@ -77,9 +77,9 @@
   /* --- ① 各エンドの直前から始める --- */
   function optGet() { try { return JSON.parse(sessionStorage.getItem('sansec_dev_opt_v1') || '{}'); } catch (e) { return {}; } }
   function optSet(o) { try { sessionStorage.setItem('sansec_dev_opt_v1', JSON.stringify(Object.assign(optGet(), o))); } catch (e) { /* 保存できない環境 */ } }
-  const KIND = { mid: '途中', defeat: '敗北', minion: '手下', victory: '討伐', supreme: '最強', legend: '伝説', retire: '余生', rise: '選択(良)', fall: '選択(悪)', badgeAll: 'バッジ(全)' };
-  const KNOTE = { rise: '選択:いい効果が多い', fall: '選択:悪い効果が多い・効果なし・時間切れ', badgeAll: 'バッジ:全エンド収集(それ以外のバッジは「討伐」と同じ)' };
-  const BGMNOTE = { field: 'はじまり〜関所(晴れやか)', gate: '関所の門番', town: '関所のあと〜ライバル(城下町)', rival: 'ライバル(ロック風)', dusk: 'ライバルのあと〜魔王(暗め)', demon: '魔王(1回目〜2回目)' };
+  const KIND = { mid: '途中', defeat: '敗北', minion: '手下', victory: '討伐', supreme: '最強', legend: '伝説', retire: '余生', peace: '和平', steps: '遭遇(足音)', alert: '遭遇(魔物)', rise: '選択(良)', fall: '選択(悪)', badgeAll: 'バッジ(全)', legendPick: '選択(伝説)' };
+  const KNOTE = { rise: '選択:いい効果が多い', fall: '選択:悪い効果が多い・効果なし・時間切れ', steps: '遭遇:立ち絵のない相手(宝箱を含む)', alert: '遭遇:モンスター6種', legendPick: '選択:伝説の旅人だけの専用音(「悪い」の音色違い)', badgeAll: 'バッジ:全エンド収集(それ以外のバッジは「討伐」と同じ)' };
+  const BGMNOTE = { field: 'はじまり〜関所(晴れやか)', gate: '関所の門番', town: '関所のあと〜ライバル(城下町)', rival: 'ライバル(ロック風)', dusk: 'ライバルのあと〜魔王の前(暗め・速い)', demon: '魔王(1回目〜2回目)' };
   function initEnds() {
     const o = optGet();
     const rec = $('#optRec');

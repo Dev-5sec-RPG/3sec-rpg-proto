@@ -257,8 +257,9 @@ const GAME = (function () {
     '039': { name: tx('己の力で魔王を倒した'), text: tx('積み重ねた力が、奥義となって魔王を貫いた。'), img: 'star', kind: 'clear', epilogue: tx('魔王は倒れた。\n世界に、平和が訪れた。') },
     '040': { name: tx('仲間と共に魔王を倒した'), text: tx('仲間と心を合わせた奥義が、魔王を打ち倒した。'), img: 'star', kind: 'clear', epilogue: tx('魔王は倒れた。\n世界に、平和が訪れた。') },
     '041': { name: tx('俺は最強かもしれない'), text: tx('装備も、力も、仲間も、揃いかけていた。\n奥義は、魔王を一撃で沈めた。\n…もしかして、自分は最強かもしれない。'), img: 'star', kind: 'clear', epilogue: tx('魔王は倒れた。\n世界に、平和が訪れた。') },
-    '042': { name: tx('俺は最強だった'), text: tx('全てが揃っていた。\n奥義が放たれる前に、魔王は降参していた。\n自分は、最強だった。'), img: 'crown', kind: 'clear', epilogue: tx('魔王は降参した。\n世界に、平和が訪れた。') },
-    '043': { name: tx('最強の旅人'), text: tx('助けを呼ぶと、あの時の旅人が現れた。\n魔王は、旅人の一撃で仕留められた。\n80銀貨は、さすがに払えなかったが。'), img: 'sword', kind: 'clear', epilogue: tx('魔王は倒れた。\n世界に、平和が訪れた。') },
+    '042': { name: tx('俺は最強だった'), text: tx('装備も、力も、仲間も、全てが揃っていた。\n自分は、最強だった。'), img: 'crown', kind: 'clear', epilogue: tx('奥義を見せる間もなく、魔王は降参した。\n私は強くなりすぎた。\n世界に平和が訪れた。') },
+    '043': { name: tx('最強の旅人'), text: tx('旅人は、何も言わず、風のように去っていった。\n80銀貨は、さすがに払えなかったが。'), img: 'sword', kind: 'clear', epilogue: tx('助けを呼ぶと、あの時の旅人が颯爽と現れ、\n一太刀で魔王を倒した。\n世界に平和が訪れた。') },
+    '044': { name: tx('金で買った平和'), text: tx('賄賂として魔王に喜ばれ、和平条約を結んだ。\n剣を抜くことなく、旅は終わった。'), img: 'coin', kind: 'clear', epilogue: tx('魔王との間に、和平条約が結ばれた。\n世界に、金で買った平和が訪れた。') },
     '999': { name: tx('お疲れ様でした。'), text: tx('お気をつけてお帰り下さい。'), img: 'door', kind: 'quit' }
   };
 
@@ -266,10 +267,11 @@ const GAME = (function () {
      mid=途中エンド / defeat=モンスター・魔王敗北 / minion=魔王の手下 / victory=魔王討伐 /
      supreme=最強 / legend=伝説の旅人の助け / retire=逃げて余生
      結果画面を豪華にするのは、LUXURY に入っている種別だけ */
-  const LUXURY = { minion: 1, victory: 1, supreme: 1, legend: 1, retire: 1 };
+  const LUXURY = { minion: 1, victory: 1, supreme: 1, legend: 1, retire: 1, peace: 1 };
   function sfxKindOf(code) {
     if (code === '037') return 'minion';
     if (code === '036') return 'retire';
+    if (code === '044') return 'peace';
     if (code === '043') return 'legend';
     if (code === '042') return 'supreme';
     if (code === '038' || code === '039' || code === '040' || code === '041') return 'victory';
@@ -289,7 +291,7 @@ const GAME = (function () {
     { from: '015', to: '019', name: tx('街') },
     { from: '020', to: '024', name: tx('ライバル') },
     { from: '025', to: '028', name: tx('モンスター') },
-    { from: '029', to: '043', name: tx('魔王') }
+    { from: '029', to: '044', name: tx('魔王') }
   ];
 
   /* 図鑑の、未収集エンドのヒント(どこで、どんな状況か) */
@@ -318,10 +320,10 @@ const GAME = (function () {
     '020': tx('ライバル。ライバルを前に、逃げ出すと。'),
     '021': tx('ライバル。運に任せた勝負をして、負けると。'),
     '022': tx('ライバル。ライバルの前で、時間が過ぎると。'),
-    '023': tx('ライバル。装備が頼りないまま、仲間もなく挑むと。'),
+    '023': tx('ライバル。ステータスも装備も仲間も足りないまま、戦うと。'),
     '024': tx('ライバル。貧弱な装備で、仲間に誘うと。'),
     '025': tx('魔物。力が足りないまま、突破しようとすると。'),
-    '026': tx('強級の魔物。守りに入ると。'),
+    '026': tx('中級以上の魔物。防具が足りないまま、守りに入ると。'),
     '027': tx('中級以上の魔物。魔物の前で、時間が過ぎると。'),
     '028': tx('魔物。現実から目を背けると。'),
     '029': tx('魔王。力が足りないまま戦う、または、条件が整わないまま奥義を使うと。'),
@@ -338,6 +340,7 @@ const GAME = (function () {
     '040': tx('魔王(2回目)。仲間だけが決め手となった状態で、奥義を使うと。'),
     '041': tx('魔王(2回目)。装備・ステータス・仲間のうち、2つが揃った状態で、奥義を使うと。'),
     '042': tx('魔王(2回目)。装備・ステータス・仲間の3つが揃った状態で、奥義を使うと。'),
+    '044': tx('魔王(1回目)。20銀貨以上を持ったまま、カツアゲされると。'),
     '043': tx('魔王(2回目)。旅の途中で、ある人物と出会った後に、助けを呼ぶと。')
   };
   Object.keys(HINTS).forEach(function (k) { ENDS[k].hint = HINTS[k]; });
@@ -575,7 +578,7 @@ const GAME = (function () {
       { label: tx('戦う'), fixed: true, act: 'fight', ends: ['023'] },
       { label: tx('逃げる'), fixed: true, act: 'flee', ends: ['020'] },
       { label: tx('仲間になろうと誘う'), act: 'recruit', ends: ['024'] },
-      { label: tx('貫禄を見せつける'), act: 'presence' },
+      { label: tx('地力を見せつける'), act: 'presence' },
       { label: tx('じゃんけんをする'), act: 'janken', ends: ['021'] },
       { label: tx('有り金を差し出す'), act: 'allin' }
     ],
@@ -597,7 +600,7 @@ const GAME = (function () {
     const choices = [
       { label: tx('戦う'), fixed: true, act: 'mfight', ends: defeatEnd ? [defeatEnd] : [] },
       { label: tx('隠れる'), fixed: true, act: 'hide' },
-      { label: tx('ガードする'), fixed: true, act: 'guard', ends: tier === 3 ? ['026'] : [] },
+      { label: tx('ガードする'), fixed: true, act: 'guard', ends: tier >= 2 ? ['026'] : [] },
       { label: tx('現実から逃げる'), act: 'dream', ends: ['028'] }
     ];
     Object.keys(MSTAT).forEach(function (k) {
@@ -636,7 +639,7 @@ const GAME = (function () {
       { label: tx('仲間に戦わせる'), fixed: true, act: 'ballies', ends: ['030'] },
       { label: tx('世間話をする'), act: 'bchat', ends: ['031'] },
       { label: tx('歌を歌う'), act: 'bsing', ends: ['032'] },
-      { label: tx('カツアゲされる'), act: 'bmug', ends: [] }
+      { label: tx('カツアゲされる'), act: 'bmug', ends: ['044'] }
     ],
     q2: tx('魔王が、こちらを睨んでいる。\n「次で、決着をつけよう」'),
     choices2: [
@@ -750,8 +753,8 @@ const GAME = (function () {
   }
 
   function resolveRival(run, card, choice, rng) {
-    /* 武器も防具も持っていないと、どの選択肢でも、哀れまれる */
-    if (!slotItem(run, 'weapon') && !slotItem(run, 'armor')) {
+    /* 武器も防具も持っていないと、「戦う」以外は、哀れまれる(「戦う」だけは、普通に判定する) */
+    if (choice.act !== 'fight' && !slotItem(run, 'weapon') && !slotItem(run, 'armor')) {
       return {
         msg: tx('ライバルは、丸腰のこちらを見て、深いため息をついた。\n「これを持っていけ。話はそれからだ」\n下位の装備を押し付けられ、情けなさで気力が下がった。'),
         fx: allFx(-2), items: [ITEMS.w1, ITEMS.a1], pass: true, pity: true
@@ -759,9 +762,10 @@ const GAME = (function () {
     }
     switch (choice.act) {
       case 'fight':
-        if (equipSum(run) >= 2) return { msg: tx('装備を構えて斬り結ぶと、ライバルは尻もちをついた。\n「くそっ…通れ!」'), pass: true };
-        if (!run.allies.length) return { end: '023' };      // 装備が弱く、奪われる仲間もいない
-        return { msg: tx('装備が心もとなく、あっさり押し負けた。\nライバルは勝ち誇って、仲間を引き抜いて、道を空けた。'),
+        /* ステータスの合計が10以上、または、装備と仲間のランクの合計が4以上で突破。満たせなければ、仲間を1人奪われる */
+        if (total(run) >= 10 || equipSum(run) + allyPower(run) >= 4) return { msg: tx('装備を構えて斬り結ぶと、ライバルは尻もちをついた。\n「くそっ…通れ!」'), pass: true };
+        if (!run.allies.length) return { end: '023' };      // 力が足りず、奪われる仲間もいない
+        return { msg: tx('力が及ばず、あっさり押し負けた。\nライバルは勝ち誇って、仲間を1人引き抜いて、道を空けた。'),
           loseAlly: true, pass: true };
       case 'flee':
         return { end: '020' };
@@ -770,8 +774,8 @@ const GAME = (function () {
         if (hasRank(run, 2)) return { msg: tx('「装備が貧弱だな」と鼻で笑われた。\n自信をなくして、とぼとぼと通り抜けた。'), fx: allFx(-1), pass: true };
         return { end: '024' };                                // 下位の装備だけでは、相手にされない
       case 'presence':
-        if (total(run) >= 6) return { msg: tx('全身から漂う貫禄に、ライバルはたじろいだ。\n「…通れ」'), pass: true };
-        return { msg: tx('貫禄が足りず、取り囲まれた。\n装備を置いていくことで、通してもらえた。'), loseEquip: true, pass: true };
+        if (total(run) >= 8) return { msg: tx('地力の違いに、ライバルはたじろいだ。\n「…通れ」'), pass: true };
+        return { msg: tx('地力が足りず、取り囲まれた。\n装備を置いていくことで、通してもらえた。'), loseEquip: true, pass: true };
       case 'janken':
         if (rng() < 0.5) return { msg: tx('じゃんけんぽん。勝った。\n「くそっ、三回勝負だ!」と言われたが、構わず通り抜けた。'), pass: true };
         return { end: '021' };
@@ -827,22 +831,27 @@ const GAME = (function () {
           if (t === 1) return { msg: tx('返り討ちに遭った。\n命からがら、逃げ出した。'), fx: allFx(-1) };
           return { end: card.defeatEnd };
         }
+        const loot = 1 + Math.floor(rng() * 3);                // 勝つと、1〜3銀貨を得る
         if (rng() < 0.5) {
           const s = randStat(rng), fx = {};
           fx[s.key] = t;
-          return { msg: tx('{w}を倒した!\n戦いの中で、{s}が磨かれた。', { w: card.who, s: s.label }), fx: fx };
+          return { msg: tx('{w}を倒した!\n戦いの中で、{s}が磨かれた。', { w: card.who, s: s.label }), fx: fx, gold: loot };
         }
         const slot = rng() < 0.5 ? 'weapon' : 'armor';
         const it = ITEMS[(slot === 'weapon' ? 'w' : 'a') + t];
-        return gain(run, it, tx('{w}を倒した!\n戦利品として、{n}を手に入れた。', { w: card.who, n: it.name }));
+        return gain(run, it, tx('{w}を倒した!\n戦利品として、{n}を手に入れた。', { w: card.who, n: it.name }), { gold: loot });
       }
       case 'hide': {
         const s = randStat(rng), fx = {};
+        if (rng() < 1 / 3) {                                   // 3分の1で、気が滅入ってステータスが下がる
+          fx[s.key] = -1;
+          return { msg: tx('物陰に隠れたが、見つかる不安に心をすり減らした。\n{s}が下がった気がする。', { s: s.label }), fx: fx };
+        }
         fx[s.key] = 1;
         return { msg: tx('物陰に隠れて、やり過ごした。\n息を潜めるうちに、{s}が研ぎ澄まされた。', { s: s.label }), fx: fx };
       }
       case 'guard': {
-        if (t === 3) return { end: '026' };
+        if (t >= 2 && rankOf(run, 'armor') < t) return { end: '026' };      // 上には上の防具、中には中の防具が要る
         const s = randStat(rng), fx = {};
         fx[s.key] = 2;
         return { msg: tx('身を固めて、攻撃を受け止めた。\n{s}が鍛えられた気がする。', { s: s.label }), fx: fx };
@@ -882,7 +891,8 @@ const GAME = (function () {
           if (run.stats.courage + run.stats.caution >= 6) return { msg: tx('渾身の歌声が、魔王城に響いた。\n魔王が、耳をふさいでうずくまった。'), next: true };
           return { end: '032' };
         case 'bmug':
-          if (run.money >= 5) return { msg: tx('「金を出せ」と、魔王にカツアゲされた。\n財布を差し出すと、魔王は上機嫌になった。'), gold: -run.money, next: true };
+          if (run.money >= 20) return { end: '044' };       // 20銀貨以上なら、賄賂として喜ばれ、和平条約へ
+          if (run.money >= 1) return { msg: tx('「金を出せ」と、魔王にカツアゲされた。\n財布を差し出すと、魔王は上機嫌になった。'), gold: -run.money, next: true };
           return { msg: tx('「出せ」と言われたが、出せるものがなかった。\n魔王は、深いため息をついた。'), next: true };   // 所持金が足りなくても、エンドにはしない
       }
       return { end: card.timeout.end };

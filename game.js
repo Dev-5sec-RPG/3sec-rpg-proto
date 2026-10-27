@@ -191,7 +191,8 @@
       });
     }
     /* 門番・ライバル・魔王は、「〇〇〇だ」の直前に立ち絵をカットインさせる */
-    if (!first && typeof PORTRAITS !== 'undefined' && PORTRAITS[card.id]) cutIn(PORTRAITS[card.id], open, card.id); else open();
+    if (!first && typeof PORTRAITS !== 'undefined' && PORTRAITS[card.id]) cutIn(PORTRAITS[card.id], open, card.id);
+    else { if (!first) SFX.play(card.tier ? 'alert' : 'steps'); open(); }     // 立ち絵のない相手は、足音(モンスターだけは、緊張する音)
   }
 
   /* カットイン: 0.1秒でフェードインしながら右から入り、表示したあと、0.1秒でフェードアウトしながら左へ抜ける。
@@ -249,11 +250,24 @@
   /* 選択の直後の音: いい効果が多ければ「上がる3音」。悪い効果が多い・効果なし・時間切れは「下がる3音」。エンドへ向かう時は鳴らさない */
   function feedback(out, timedOut) {
     if (out.end) return;
+    if (curCard && curCard.id === 'trav_max') { SFX.play('legendPick'); return; }   // 伝説の旅人だけは、専用の音
+    /* 関所・ライバルを抜けたら「いい音」。ただし、ステータスが下がる・装備や仲間を奪われる突破は、悪い音 */
+    if (out.pass) {
+      const lost = out.loseEquip || out.loseAlly || (out.fx && Object.keys(out.fx).some(function (k) { return out.fx[k] < 0; }));
+      SFX.play(lost ? 'fall' : 'rise');
+      return;
+    }
+    /* 装備・仲間が増えるのは、所持金を失っても「いいこと」。ただし、今より弱い装備に替えてしまう時は悪い方 */
+    const weaker = (out.items || []).some(function (it) {
+      const cur = run.equip.filter(function (e) { return e.slot === it.slot; })[0];
+      return cur && cur.rank > it.rank;
+    });
+    if (weaker) { SFX.play('fall'); return; }
+    if (!timedOut && ((out.items && out.items.length) || out.ally)) { SFX.play('rise'); return; }
     let good = 0, bad = 0;
     if (out.fx) Object.keys(out.fx).forEach(function (k) { if (out.fx[k] > 0) good += out.fx[k]; else bad -= out.fx[k]; });
     const gold = (typeof out.gold === 'number') ? out.gold : 0;
     if (gold > 0) good += 1; else if (gold < 0) bad += 1;
-    if (out.items || out.ally) good += 1;
     if (out.loseAlly || out.loseAllAllies || out.loseEquip || out.loseSlot) bad += 1;
     SFX.play(!timedOut && good > bad ? 'rise' : 'fall');
   }
@@ -268,8 +282,9 @@
     setPurse(run.money, out.goldDelta);
     setGear();
     if (out.end) { leave(out.end, out.why); return; }
-    if (curCard && curCard.id === 'B') SFX.bgm('town');
-    else if (curCard && curCard.id === 'C') SFX.bgm('dusk');
+    /* 関所・ライバルを抜けた結果の画面は、無音。次の画面へ進む時に、次の曲を流し始める */
+    const nextBgm = curCard && curCard.id === 'B' ? 'town' : curCard && curCard.id === 'C' ? 'dusk' : null;
+    if (nextBgm) SFX.bgmStop();
     const parts = STATS.filter(function (s) { return out.fx && out.fx[s.key]; }).map(function (s) {
       return [s.label, out.fx[s.key]];
     });
@@ -284,7 +299,7 @@
     showTap(
       '<div class="window tappable"><p class="line">' + out.msg + '</p><span class="more" aria-hidden="true">▼</span></div>' +
       '<div class="deltas">' + chips + '</div>',
-      tx('次へ'), after || nextCard
+      tx('次へ'), nextBgm ? function () { SFX.bgm(nextBgm); (after || nextCard)(); } : (after || nextCard)
     );
   }
 
@@ -331,6 +346,19 @@
       tx('次へ'), function () { showStory(n + 1); }
     );
   }
+  /* 「始める」のあと: 効果音の長さの半分で暗転、残り半分で次の画面を出し、終わってから曲を流す(効果音と曲を重ねない) */
+  function fadeSwap(render, done) {
+    const half = Math.round(SFX.length('rise') * 1000 / 2);
+    stage.style.transition = 'opacity ' + half + 'ms linear';
+    stage.style.opacity = '0';
+    setTimeout(function () {
+      render();
+      stage.style.opacity = '0';
+      void stage.offsetWidth;
+      stage.style.opacity = '1';
+      setTimeout(function () { stage.style.transition = ''; stage.style.opacity = ''; done(); }, half);
+    }, half);
+  }
   function showStart() {
     run = G.newRun();
     pipLabels = ['A'];
@@ -343,7 +371,7 @@
       who: null, q: tx('始めますか。'), shuffle: false, labels: [tx('始める'), tx('始めない')],
       mark: (DEV && C.devPreset() && C.devPreset().pick) ? ['始める', '始めない'].indexOf(C.devPreset().pick) : -1,
       onPick: function (i) {
-        if (i === 0) { run.history.push({ who: 'A', text: tx('始める') }); SFX.play('rise'); SFX.bgm('field'); return function () { showStory(0); }; }
+        if (i === 0) { run.history.push({ who: 'A', text: tx('始める') }); SFX.play('rise'); return function () { fadeSwap(function () { showStory(0); }, function () { SFX.bgm('field'); }); }; }
         run.history.push({ who: 'A', text: tx('始めない') });
         leave('999');
       },

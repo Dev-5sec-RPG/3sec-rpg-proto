@@ -372,6 +372,10 @@ html, body { overflow-x: hidden; overflow-x: clip; }
 .fx-minion .fx-layer .halo { animation: haloIn 1.2s ease-out 1s both, pulse 2.4s ease-in-out 2.4s infinite; }
 .fx-minion .fx-layer .sp, .fx-retire .fx-layer .sp { clip-path: circle(50%); width: 9px; height: 9px; animation: drift 3.6s ease-out calc(1.6s + var(--d) * 2s) infinite; }
 .fx-minion .fx-layer .sp { background: rgb(230, 80, 90); }
+.fx-peace { --fx: 120, 210, 140; --fx-title: #1f7a45; --fx-hi: #fff6c0; }
+.fx-peace .fx-layer .rays { display: none; }
+.fx-peace .fx-layer .halo { width: 420px; height: 420px; left: -210px; top: -210px; }
+.fx-peace .fx-layer .sp { clip-path: circle(50%); width: 9px; height: 9px; background: rgb(250, 214, 110); animation: drift 3.6s ease-out calc(1.6s + var(--d) * 2s) infinite; }
 .fx-retire { --fx: 255, 178, 107; --fx-title: #b35a10; --fx-hi: #fff0d0; }
 .fx-retire .fx-layer .rays { display: none; }
 .fx-retire .fx-layer .halo { width: 420px; height: 420px; left: -210px; top: -210px; }
@@ -380,10 +384,12 @@ html, body { overflow-x: hidden; overflow-x: clip; }
   :root:not([data-theme="light"]) .fx-legend { --fx-title: #8fe0ff; }
   :root:not([data-theme="light"]) .fx-minion { --fx-title: #ff7a8e; }
   :root:not([data-theme="light"]) .fx-retire { --fx-title: #ffb26b; }
+  :root:not([data-theme="light"]) .fx-peace { --fx-title: #7be0a0; }
 }
 :root[data-theme="dark"] .fx-legend { --fx-title: #8fe0ff; }
 :root[data-theme="dark"] .fx-minion { --fx-title: #ff7a8e; }
 :root[data-theme="dark"] .fx-retire { --fx-title: #ffb26b; }
+:root[data-theme="dark"] .fx-peace { --fx-title: #7be0a0; }
 @media (prefers-reduced-motion: reduce) {
   .fx-layer .rays, .fx-layer .halo, .fx-layer .ring, .fx-layer .sp { animation: none !important; }
   .fx-layer .rays, .fx-layer .halo { opacity: .8; }
@@ -396,6 +402,7 @@ html, body { overflow-x: hidden; overflow-x: clip; }
 .veil.fx-victory, .veil.fx-supreme { background: radial-gradient(circle at 50% 42%, rgba(255, 232, 150, .85), rgba(255, 232, 150, 0) 72%), var(--bg); }
 .veil.fx-legend { background: radial-gradient(circle at 50% 40%, rgba(150, 220, 255, .8), rgba(150, 220, 255, 0) 72%), var(--bg); }
 .veil.fx-minion { background: radial-gradient(circle at 50% 50%, rgba(130, 30, 80, .55), rgba(130, 30, 80, 0) 80%), var(--bg); }
+.veil.fx-peace { background: radial-gradient(circle at 50% 50%, rgba(150, 230, 170, .65), rgba(150, 230, 170, 0) 75%), var(--bg); }
 .veil.fx-retire { background: radial-gradient(circle at 50% 58%, rgba(255, 190, 120, .7), rgba(255, 190, 120, 0) 75%), var(--bg); }
 
 /* ====== ⑥ バッジ ====== */

@@ -577,5 +577,20 @@ const EN_DICT = {
  "深い眠りの底で、何かが零れ落ちていった。\n起きたら、その場しのぎの術まで忘れていた。": "At the bottom of a deep sleep, something slipped away.\nWhen you woke, you had even forgotten how to think on your feet.",
  "飲んだ瞬間、怖いものがなくなった。\n同時に、口がうまく回らなくなった。": "The moment you drank, nothing scared you anymore.\nAt the same time, your tongue stopped working properly.",
  "このゲームの記録は、端末内にだけ保存されます。\nブラウザのデータを消去すると、図鑑とバッジも消えます。": "Your records in this game are stored only on this device.\nIf you clear your browser data, your codex and badges will be erased too.",
- "助けを呼ぶと、あの時の旅人が現れた。\n魔王は、旅人の一撃で仕留められた。\n80銀貨は、さすがに払えなかったが。": "When you called for help, the traveler from before appeared.\nThe Demon King was finished off with a single blow from the traveler.\nYou still couldn't pay the 80 silver, of course."
+ "助けを呼ぶと、あの時の旅人が現れた。\n魔王は、旅人の一撃で仕留められた。\n80銀貨は、さすがに払えなかったが。": "When you called for help, the traveler from before appeared.\nThe Demon King was finished off with a single blow from the traveler.\nYou still couldn't pay the 80 silver, of course.",
+ "地力を見せつける": "Show your true strength",
+ "地力の違いに、ライバルはたじろいだ。\n「…通れ」": "The rival flinched at the difference in raw strength.\n\"...Go on through.\"",
+ "地力が足りず、取り囲まれた。\n装備を置いていくことで、通してもらえた。": "You lacked raw strength and were surrounded.\nThey let you pass in exchange for your gear.",
+ "力が及ばず、あっさり押し負けた。\nライバルは勝ち誇って、仲間を1人引き抜いて、道を空けた。": "You were easily overpowered.\nThe rival gloated, took one of your allies, and cleared the path.",
+ "物陰に隠れたが、見つかる不安に心をすり減らした。\n{s}が下がった気がする。": "You hid in the shadows, but the fear of being found wore you down.\nYou feel your {s} has dropped.",
+ "金で買った平和": "Peace, Bought with Gold",
+ "賄賂として魔王に喜ばれ、和平条約を結んだ。\n剣を抜くことなく、旅は終わった。": "The Demon King was delighted with the bribe, and you signed a peace treaty.\nThe journey ended without ever drawing a sword.",
+ "魔王との間に、和平条約が結ばれた。\n世界に、金で買った平和が訪れた。": "A peace treaty was signed with the Demon King.\nA peace bought with gold came to the world.",
+ "ライバル。ステータスも装備も仲間も足りないまま、戦うと。": "The rival. You fought without enough stats, gear or allies.",
+ "中級以上の魔物。防具が足りないまま、守りに入ると。": "A mid-level or higher monster. You went on the defensive without enough armor.",
+ "魔王(1回目)。20銀貨以上を持ったまま、カツアゲされると。": "The Demon King (1st time). You got mugged while carrying 20 silver or more.",
+ "装備も、力も、仲間も、全てが揃っていた。\n自分は、最強だった。": "Gear, strength, allies... everything was in place.\nI was the strongest.",
+ "奥義を見せる間もなく、魔王は降参した。\n私は強くなりすぎた。\n世界に平和が訪れた。": "The Demon King surrendered before you could even show your secret art.\nI had grown far too strong.\nPeace came to the world.",
+ "旅人は、何も言わず、風のように去っていった。\n80銀貨は、さすがに払えなかったが。": "The traveler left like the wind, without a word.\nYou still couldn't pay the 80 silver, of course.",
+ "助けを呼ぶと、あの時の旅人が颯爽と現れ、\n一太刀で魔王を倒した。\n世界に平和が訪れた。": "When you called for help, the traveler from before appeared in a flash\nand felled the Demon King with a single stroke.\nPeace came to the world."
 };
