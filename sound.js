@@ -15,14 +15,29 @@ const SFX = (function () {
     return 440 * Math.pow(2, (n - 69) / 12);
   }
 
+  /* 音量が大きい所だけをなだらかに抑える曲線。0.6 までは、音をいじらない(コンプレッサーのように、音量が揺れない) */
+  function softCurve() {
+    const n = 4097, d = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = i / (n - 1) * 2 - 1, a = Math.abs(x);
+      const y = a <= 0.6 ? a : 0.6 + 0.4 * Math.tanh((a - 0.6) / 0.4);
+      d[i] = x < 0 ? -y : y;
+    }
+    return d;
+  }
   function make(target) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
-    const c = target || new AC();
+    let c = target;
+    if (!c) { try { c = new AC({ latencyHint: 'balanced' }); } catch (e) { c = new AC(); } }
     const g = c.createGain();
-    g.gain.value = 0.55;
-    const comp = c.createDynamicsCompressor();
-    g.connect(comp); comp.connect(c.destination);
+    g.gain.value = 0.75;
+    /* 10kHz より上は切る(シャーという高い雑音と、矩形波の耳につく高域を抑える) */
+    const lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 10000; lp.Q.value = 0.5;
+    const sh = c.createWaveShaper();
+    sh.curve = softCurve(); sh.oversample = '2x';
+    g.connect(lp); lp.connect(sh); sh.connect(c.destination);
     return { c: c, out: g };
   }
   function ensure() {
@@ -35,7 +50,9 @@ const SFX = (function () {
     if (c.__noise) return c.__noise;
     const len = c.sampleRate;
     const b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    /* 毎回同じ並びの雑音にする(検証で、前後を比べられるように) */
+    let x = 123456789;
+    for (let i = 0; i < len; i++) { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; d[i] = ((x >>> 0) / 4294967296) * 2 - 1; }
     c.__noise = b;
     return b;
   }
@@ -43,17 +60,22 @@ const SFX = (function () {
   /* 1音: 立ち上がり→減衰。o = { type, vol, a(立ち上がり), r(余韻), to(終わりの周波数), lp(ローパス), vib(ビブラート深さHz), det(うなり) } */
   function tone(S, freq, t0, dur, o) {
     o = o || {};
-    const c = S.c, t = (S.base != null ? S.base : c.currentTime + 0.03) + t0;
+    const c = S.c, now = c.currentTime;
+    let t = (S.base != null ? S.base : now + 0.03) + t0;
+    if (S.hi != null && (t < S.lo || t >= S.hi)) return;      // 先読みの窓の外は、まだ作らない
+    const a = o.a == null ? 0.012 : o.a, r = o.r == null ? 0.08 : o.r, v = (o.vol == null ? 0.2 : o.vol);
+    if (t + dur + r < now) return;                            // すでに過ぎた音は鳴らさない
+    if (t < now) t = now + 0.003;                             // 少し遅れた音は、わずかに遅らせる(プチ音の防止)
     const osc = c.createOscillator(), g = c.createGain();
     osc.type = o.type || 'square';
     osc.frequency.setValueAtTime(freq, t);
     if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
     if (o.det) osc.detune.value = o.det;
-    const a = o.a == null ? 0.012 : o.a, r = o.r == null ? 0.08 : o.r, v = (o.vol == null ? 0.2 : o.vol);
     g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(v, t + a);
     g.gain.setValueAtTime(v, t + Math.max(a, dur - r));
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur + r);
+    g.gain.linearRampToValueAtTime(0, t + dur + r + 0.01);
     let tail = osc;
     if (o.lp) {
       const lp = c.createBiquadFilter();
@@ -76,16 +98,27 @@ const SFX = (function () {
   /* 雑音(ドン、シャラ、など) */
   function burst(S, t0, dur, o) {
     o = o || {};
-    const c = S.c, t = (S.base != null ? S.base : c.currentTime + 0.03) + t0;
+    const c = S.c, now = c.currentTime;
+    let t = (S.base != null ? S.base : now + 0.03) + t0;
+    if (S.hi != null && (t < S.lo || t >= S.hi)) return;
+    if (t + dur < now) return;
+    if (t < now) t = now + 0.003;
     const src = c.createBufferSource(), g = c.createGain(), flt = c.createBiquadFilter();
     src.buffer = noise(c);
     flt.type = o.type || 'lowpass'; flt.frequency.setValueAtTime(o.f0 || 800, t);
+    if (o.q) flt.Q.value = o.q;
     if (o.f1) flt.frequency.exponentialRampToValueAtTime(o.f1, t + dur);
-    g.gain.setValueAtTime(o.vol || 0.3, t);
+    /* 雑音の始まりに、ごく短い立ち上がりをつける(いきなり最大だと、プチッという音になる) */
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(o.vol || 0.3, t + 0.002);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.gain.linearRampToValueAtTime(0, t + dur + 0.01);
     src.connect(flt); flt.connect(g); g.connect(S.out);
-    src.start(t); src.stop(t + dur + 0.05);
+    /* 毎回同じ雑音の同じ場所から始めない(機械的な「ツッ」という繰り返し感を防ぐ)。開始時刻から決めるので、再現できる */
+    src.start(t, ((t * 7919) % 1) * 0.4); src.stop(t + dur + 0.05);
   }
+  /* ハイハット: 帯域を絞った、小さな「チッ」(白色雑音の高音域をそのまま出すと、シャーという雑音に聞こえる) */
+  function hat(S, t0, vol, fr) { burst(S, t0, 0.03, { type: 'bandpass', f0: fr || 5200, q: 1.2, vol: vol }); }
   /* きらきら(高い音の連なり) */
   function sparkle(S, t0, span, count, base) {
     const pent = ['C6', 'D6', 'E6', 'G6', 'A6', 'C7', 'D7', 'E7'];
@@ -155,7 +188,7 @@ const SFX = (function () {
       burst(S, 0.00, 0.3, { type: 'lowpass', f0: 300, f1: 80, vol: 0.45 });
       tone(S, f('E5'), 0.30, 0.08, { type: 'square', lp: 2400, vol: 0.12, a: 0.003, r: 0.04 });
       tone(S, f('Bb5'), 0.40, 0.08, { type: 'square', lp: 2400, vol: 0.12, a: 0.003, r: 0.04 });
-      burst(S, 0.30, 0.35, { type: 'highpass', f0: 1500, f1: 6000, vol: 0.12 });
+      burst(S, 0.30, 0.35, { type: 'bandpass', f0: 2600, f1: 4200, q: 0.8, vol: 0.07 });
     },
     /* バッジ(全エンド収集): 明るいファンファーレ(約4.2秒) */
     badgeAll: function (S) {
@@ -248,7 +281,6 @@ const SFX = (function () {
         [0, 2].forEach(function (k) { tone(S, f(c[0]) / 2, t + k * b, 1.8 * b, { type: 'triangle', vol: 0.2, a: 0.01, r: 0.1 }); });
         [0, 1, 2, 3, 2, 1, 2, 3].forEach(function (ix, i) {
           tone(S, f(c[ix]) * 2, t + i * b / 2, b * 0.4, { type: 'triangle', vol: 0.06, a: 0.005, r: 0.08 });
-          burst(S, t + i * b / 2, 0.03, { type: 'highpass', f0: 7000, vol: 0.04 });
         });
       });
       [['E5', 0, 1], ['G5', 1, 1], ['E5', 2, 0.5], ['D5', 2.5, 0.5], ['C5', 3, 1],
@@ -268,9 +300,8 @@ const SFX = (function () {
         tone(S, f(c[0][1]), t + 2 * b, b * 0.8, { type: 'triangle', vol: 0.22, a: 0.008, r: 0.06 });
         [1, 3].forEach(function (k) {
           chord(S, c[1], t + k * b, b * 0.4, { type: 'square', lp: 1800, vol: 0.12, a: 0.004, r: 0.04 });
-          burst(S, t + k * b, 0.1, { type: 'highpass', f0: 3000, vol: 0.09 });
+          burst(S, t + k * b, 0.1, { type: 'bandpass', f0: 3500, q: 0.8, vol: 0.06 });
         });
-        for (let i = 0; i < 8; i++) burst(S, t + i * b / 2, 0.025, { type: 'highpass', f0: 8000, vol: 0.035 });
       });
       [['B4', 0, 0.5], ['D5', 0.5, 0.5], ['G5', 1, 1], ['F#5', 2, 0.5], ['E5', 2.5, 0.5], ['D5', 3, 1],
         ['E5', 4, 0.5], ['G5', 4.5, 0.5], ['C6', 5, 1], ['B5', 6, 0.5], ['A5', 6.5, 0.5], ['G5', 7, 1],
@@ -295,7 +326,7 @@ const SFX = (function () {
         for (let k = 0; k < 8; k++) tone(S, f(bar.arp[k % 4]) * (k >= 4 ? 2 : 1), t + k * b / 2, b * 0.4, { type: 'sawtooth', lp: 900, vol: 0.07, a: 0.004, r: 0.04 });
         for (let k = 0; k < 4; k++) tone(S, 105, t + k * b, 0.13, { type: 'sine', to: 42, vol: 0.4, a: 0.003, r: 0.06 });
         [1, 3].forEach(function (k) { burst(S, t + k * b, 0.13, { type: 'bandpass', f0: 1000, vol: 0.2 }); });
-        for (let k = 0; k < 8; k++) burst(S, t + k * b / 2, 0.02, { type: 'highpass', f0: 7500, vol: 0.03 });
+        for (let k = 0; k < 8; k++) hat(S, t + k * b / 2, 0.018);
       });
       [['E5', 0, 2], ['D5', 2, 1], ['C5', 3, 1], ['Bb4', 4, 2], ['A4', 6, 2], ['D5', 8, 2], ['C5', 10, 1], ['Bb4', 11, 1],
         ['B4', 12, 2], ['D5', 14, 1], ['E5', 15, 1], ['G#4', 16, 2], ['B4', 18, 2]].forEach(function (n) {
@@ -308,7 +339,7 @@ const SFX = (function () {
       const bass = ['D2', 'D2', 'A1', 'A1', 'Bb1', 'Bb1', 'A1', 'A1'];
       for (let i = 0; i < 16; i++) {
         tone(S, f(bass[(i >> 1) % 8]), i * b, b * 0.8, { type: 'triangle', vol: 0.22, a: 0.01, r: 0.08 });
-        if (i % 2 === 1) burst(S, i * b, 0.09, { type: 'highpass', f0: 2500, vol: 0.12 });
+        if (i % 2 === 1) burst(S, i * b, 0.09, { type: 'bandpass', f0: 3000, q: 0.8, vol: 0.08 });
         if (i % 4 === 0) tone(S, 70, i * b, 0.12, { type: 'sine', to: 40, vol: 0.3, a: 0.003, r: 0.05 });
       }
       const mel = [['D4', 0], ['F4', 1], ['A4', 2], ['F4', 3], ['E4', 4], ['G4', 5], ['A4', 6], ['G4', 7],
@@ -330,8 +361,7 @@ const SFX = (function () {
           const t = bar * 4 * b + k * b;
           if (k % 2 === 0) tone(S, 120, t, 0.14, { type: 'sine', to: 45, vol: 0.5, a: 0.002, r: 0.05 });
           else burst(S, t, 0.16, { type: 'bandpass', f0: 1800, vol: 0.28 });
-          burst(S, t, 0.04, { type: 'highpass', f0: 6000, vol: 0.1 });
-          burst(S, t + b / 2, 0.04, { type: 'highpass', f0: 6000, vol: 0.08 });
+          hat(S, t, 0.05); hat(S, t + b / 2, 0.04);
         }
       }
       const riff = [['E4', 0], ['G4', 0.5], ['B4', 1], ['A4', 1.5], ['G4', 2], ['E4', 3], ['G4', 4], ['B4', 4.5], ['D5', 5], ['C5', 5.5], ['B4', 6], ['G4', 7]];
@@ -356,7 +386,7 @@ const SFX = (function () {
         }
         [1, 3].forEach(function (k) { burst(S, t + k * b, 0.14, { type: 'bandpass', f0: 900, vol: 0.2 }); });
         [0, 2.5].forEach(function (k) { chord(S, [bar.arp[0], bar.arp[1], bar.arp[2]].map(function (n) { return n.replace(/(\d)$/, function (m, d) { return String(Number(d) + 1); }); }), t + k * b, b * 0.35, { type: 'sawtooth', lp: 1500, vol: 0.2, a: 0.01, r: 0.05 }); });
-        for (let k = 0; k < 8; k++) burst(S, t + k * b / 2, 0.02, { type: 'highpass', f0: 7500, vol: 0.035 });
+        for (let k = 0; k < 8; k++) hat(S, t + k * b / 2, 0.02);
       });
       [['A5', 0, 1], ['Ab5', 1, 1], ['G5', 2, 2], ['F5', 4, 1], ['E5', 5, 1], ['F5', 6, 2],
         ['Eb5', 8, 1], ['D5', 9, 1], ['Eb5', 10, 1], ['G5', 11, 1], ['A5', 12, 1], ['Bb5', 13, 1], ['A5', 14, 1], ['C#6', 15, 1]].forEach(function (n) {
@@ -378,6 +408,23 @@ const SFX = (function () {
       setTimeout(function () { try { b.gain.disconnect(); } catch (e) { /* すでに切れている */ } }, 400);
     } catch (e) { /* 止められなくても、ゲームは続ける */ }
   }
+  /* 曲の実行役。ループ1周ぶんを一度に作らず、これから1秒ぶんの音だけを作る
+     (音のつなぎ目を何百も同時に作ると、処理の重い端末で音が途切れ、プチプチ鳴る原因になる) */
+  const AHEAD = 1.0;
+  function runner(c, out, def, t0) {
+    const S = { c: c, out: out, base: null, lo: null, hi: null };
+    let win = t0;
+    return {
+      S: S,
+      step: function (now) {
+        if (win < now) win = now + 0.05;             // 裏に回るなどして遅れた時は、過ぎた分を一度に鳴らさず、今から続ける
+        const hi = now + AHEAD;
+        let k = Math.max(0, Math.floor((win - t0) / def.len));
+        for (; t0 + k * def.len < hi; k++) { S.base = t0 + k * def.len; S.lo = win; S.hi = hi; def.pat(S); }
+        win = hi;
+      }
+    };
+  }
   function bgmStart(kind, force) {
     if (bgm && bgm.kind === kind && !force) return;          // すでに同じ曲が鳴っているなら、そのまま続ける
     bgmStop();
@@ -391,11 +438,10 @@ const SFX = (function () {
       gain.gain.setValueAtTime(0.0001, c.currentTime);
       gain.gain.linearRampToValueAtTime(0.6, c.currentTime + 0.08);
       gain.connect(S0.out);
-      const S = { c: c, out: gain, base: null }, def = BGMS[kind];
-      let next = c.currentTime + 0.05;
-      const sched = function () { while (next < c.currentTime + 1.2) { S.base = next; def.pat(S); next += def.len; } };
+      const run = runner(c, gain, BGMS[kind], c.currentTime + 0.05);
+      const sched = function () { run.step(c.currentTime); };
       sched();
-      bgm = { kind: kind, S: S, gain: gain, timer: setInterval(sched, 250) };
+      bgm = { kind: kind, S: run.S, gain: gain, timer: setInterval(sched, 250) };
     } catch (e) { bgm = null; }
   }
   const LENGTH = { mid: 0.7, defeat: 0.95, rise: 0.3, fall: 0.3, steps: 0.4, alert: 0.7, peace: 4.2, legendPick: 0.45, badgeAll: 4.2, minion: 4.0, victory: 4.1, supreme: 5.0, legend: 4.6, retire: 4.2 };
@@ -416,11 +462,18 @@ const SFX = (function () {
     bgmStop: bgmStop,
     bgmKinds: Object.keys(BGMS),
     bgmLength: function (k) { return BGMS[k] ? BGMS[k].len : 0; },
-    _renderBgm: function (kind, seconds) {
+    /* 書き出し用(検証): loops=周回数。sched=true なら、実際の再生と同じ「先読みの窓」で描く */
+    _renderBgm: function (kind, seconds, loops, sched) {
       const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
       const oc = new OAC(1, 44100 * seconds, 44100);
-      const S = make(oc); S.base = 0.03;
-      BGMS[kind].pat(S);
+      const S = make(oc);
+      if (sched) {
+        const run = runner(oc, S.out, BGMS[kind], 0.03);
+        run.step(0);
+        for (let t = 0.25; t < seconds; t += 0.25) oc.suspend(Math.round(t * 44100 / 128) * 128 / 44100).then(function () { run.step(oc.currentTime); oc.resume(); });
+        return oc.startRendering();
+      }
+      for (let i = 0; i < (loops || 1); i++) { S.base = 0.03 + i * BGMS[kind].len; BGMS[kind].pat(S); }
       return oc.startRendering();
     },
     setOn: function (v) {
