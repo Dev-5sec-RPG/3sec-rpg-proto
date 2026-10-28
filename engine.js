@@ -873,14 +873,14 @@ const GAME = (function () {
           return { end: card.defeatEnd };
         }
         const loot = 1 + Math.floor(rng() * 3);                // 勝つと、1〜3銀貨を得る
-        /* 上: 上装備 + ステータス計2 / 中: 中装備 + ステータス計1 / 下: どちらかが無装備なら50%で下装備、それ以外はステータス計2。装備の部位は完全にランダム */
+        /* 上: 50%で上装備+ステータス計2、50%でステータス計3 / 中: 50%で中装備+ステータス計1、50%でステータス計2 / 下: どちらかが無装備なら50%で下装備、それ以外はステータス計1。装備の部位は完全にランダム */
         let it = null, fx = null;
-        if (t === 3) { it = pickItem(run, 3, rng); fx = monsterFx(card, 2, rng); }
-        else if (t === 2) { it = pickItem(run, 2, rng); fx = monsterFx(card, 1, rng); }
+        if (t === 3) { if (rng() < 0.5) { it = pickItem(run, 3, rng); fx = monsterFx(card, 2, rng); } else fx = monsterFx(card, 3, rng); }
+        else if (t === 2) { if (rng() < 0.5) { it = pickItem(run, 2, rng); fx = monsterFx(card, 1, rng); } else fx = monsterFx(card, 2, rng); }
         else {
           const empty = ['weapon', 'armor'].some(function (sl) { return !slotItem(run, sl); });
           if (empty && rng() < 0.5) it = pickItem(run, 1, rng);
-          else fx = monsterFx(card, 2, rng);
+          else fx = monsterFx(card, 1, rng);
         }
         let msg = tx('{w}を倒した!', { w: card.who });
         if (it) msg += '\n' + tx('戦利品として、{n}を手に入れた。', { n: it.name });
