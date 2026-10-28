@@ -294,7 +294,7 @@
       return '<span class="chip ' + (v > 0 ? 'plus' : 'minus') + '">' + p[0] + ' ' + (v > 0 ? '+' : '−') + Math.abs(v) + '</span>';
     }).join('');
     chips += (out.notes || []).map(function (n) {
-      return '<span class="chip ' + (n.v > 0 ? 'plus' : 'minus') + '">' + n.t + (n.v > 0 ? tx(' 獲得') : tx(' 喪失')) + '</span>';
+      return '<span class="chip ' + (n.v > 0 ? 'plus' : 'minus') + '">' + n.t + (n.s || (n.v > 0 ? tx(' 獲得') : tx(' 喪失'))) + '</span>';
     }).join('');
     showTap(
       '<div class="window tappable"><p class="line">' + out.msg + '</p><span class="more" aria-hidden="true">▼</span></div>' +

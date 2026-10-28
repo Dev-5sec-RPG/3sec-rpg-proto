@@ -592,5 +592,13 @@ const EN_DICT = {
  "装備も、力も、仲間も、全てが揃っていた。\n自分は、最強だった。": "Gear, strength, allies... everything was in place.\nI was the strongest.",
  "奥義を見せる間もなく、魔王は降参した。\n私は強くなりすぎた。\n世界に平和が訪れた。": "The Demon King surrendered before you could even show your secret art.\nI had grown far too strong.\nPeace came to the world.",
  "旅人は、何も言わず、風のように去っていった。\n80銀貨は、さすがに払えなかったが。": "The traveler left like the wind, without a word.\nYou still couldn't pay the 80 silver, of course.",
- "助けを呼ぶと、あの時の旅人が颯爽と現れ、\n一太刀で魔王を倒した。\n世界に平和が訪れた。": "When you called for help, the traveler from before appeared in a flash\nand felled the Demon King with a single stroke.\nPeace came to the world."
+ "助けを呼ぶと、あの時の旅人が颯爽と現れ、\n一太刀で魔王を倒した。\n世界に平和が訪れた。": "When you called for help, the traveler from before appeared in a flash\nand felled the Demon King with a single stroke.\nPeace came to the world.",
+ "戦利品として、{n}を手に入れた。": "You got {n} as spoils.",
+ "{w}を倒した!": "You defeated {w}!",
+ "さらに、戦いの中で能力が磨かれた。": "On top of that, the fight sharpened your abilities.",
+ "戦いの中で、能力が磨かれた。": "The fight sharpened your abilities.",
+ "戦いの中で、装備が馴染んで一段上の品になった。": "In the fight, your gear proved itself and became a grade better.",
+ "{a}が成長した!\n「{n}」に昇格した。": "{a} has grown!\nPromoted to \"{n}\".",
+ "歴戦のライバル": "Veteran Rival",
+ " 昇格": " Promoted"
 };

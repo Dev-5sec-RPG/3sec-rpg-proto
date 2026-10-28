@@ -604,7 +604,7 @@ const GAME = (function () {
       { label: tx('現実から逃げる'), act: 'dream', ends: ['028'] }
     ];
     Object.keys(MSTAT).forEach(function (k) {
-      choices.push({ label: MSTAT[k].label, act: 'mstat', stat: k, ends: defeatEnd ? [defeatEnd] : [] });
+      choices.push({ label: MSTAT[k].label, act: 'mstat', stat: k, ends: ['025'] });
     });
     return {
       id: id, sec: 'D', tier: tier, w: 1, icon: MON_ICON[id], who: who, q: q, defeatEnd: defeatEnd, intro2: intro2,
@@ -669,14 +669,50 @@ const GAME = (function () {
   }
   function rankOf(run, slot) { const it = slotItem(run, slot); return it ? it.rank : 0; }
   function hasAlly(run, key) { return run.allies.some(function (a) { return a.key === key; }); }
-  /* 仲間の条件: 強がいる、または、弱とライバルがいる */
-  function allyOk(run) { return hasAlly(run, 'strong') || (hasAlly(run, 'weak') && hasAlly(run, 'rival')); }
+  /* 仲間の条件: 強(昇格したひよっこ含む)がいる、歴戦のライバルがいる、または、弱とライバルがいる */
+  function allyOk(run) {
+    return hasAlly(run, 'strong') || run.allies.some(function (a) { return a.key === 'rival' && a.vet; }) || (hasAlly(run, 'weak') && hasAlly(run, 'rival'));
+  }
   function allyPower(run) { return run.allies.reduce(function (s, a) { return s + a.power; }, 0); }
   /* 装備は数値に換算する(無=0 / 下=1 / 中=2 / 上=3)。武器と防具の合計で判定する */
   function equipSum(run) { return rankOf(run, 'weapon') + rankOf(run, 'armor'); }
   function equipMid(run) { return equipSum(run) >= 4; }   // 中+中以上(上+下でも満たす)
   function equipTop(run) { return equipSum(run) >= 5; }   // 上+中以上
   function randStat(rng) { return STATS[Math.floor(rng() * STATS.length)]; }
+  /* ランダムなステータスに、合計 n を振り分ける(同じステータスに重なることもある) */
+  function statFx(rng, n) {
+    const fx = {};
+    for (let k = 0; k < n; k++) { const key = randStat(rng).key; fx[key] = (fx[key] || 0) + 1; }
+    return fx;
+  }
+  /* 指定ランクの装備を、武器か防具のランダムな方に与える(今より弱くなることもある) */
+  function pickItem(run, rank, rng) {
+    const sl = rng() < 0.5 ? 'weapon' : 'armor';
+    return ITEMS[(sl === 'weapon' ? 'w' : 'a') + rank];
+  }
+  /* 魔物ごとに、勝って伸びるステータスは2種類。計n上がる時は、2種類に分散する(1なら、どちらかランダム) */
+  const MON_STATS = {
+    m_slime: ['caution', 'charm'], m_bat: ['courage', 'improv'], m_orc: ['courage', 'improv'],
+    m_skel: ['caution', 'charm'], m_wyvern: ['courage', 'charm'], m_general: ['caution', 'improv']
+  };
+  function monsterFx(card, n, rng) {
+    const pair = MON_STATS[card.id] || ['courage', 'caution'], fx = {};
+    const first = rng() < 0.5 ? 0 : 1;
+    for (let k = 0; k < n; k++) { const key = pair[(first + k) % 2]; fx[key] = (fx[key] || 0) + 1; }
+    return fx;
+  }
+  /* 持っている装備のうち、ランダムな1つを1ランク上げる(上は対象外。対象がなければ null) */
+  function bumpItem(run, rng) {
+    const list = run.equip.filter(function (e) { return e.rank < 3; });
+    if (!list.length) return null;
+    const e = list[Math.floor(rng() * list.length)];
+    return ITEMS[(e.slot === 'weapon' ? 'w' : 'a') + (e.rank + 1)];
+  }
+  /* 仲間の経験値(画面には出さない)。下1・中2・上3。基準に達すると昇格する */
+  const RANKUP = {
+    rival: { need: 4, to: { key: 'rival', name: tx('歴戦のライバル'), power: 3, vet: true } },
+    weak:  { need: 7, to: { key: 'strong', name: tx('歴戦の旅人'), power: 3 } }
+  };
 
   /* 重み付きで、重複なく n 枚引く */
   function drawFrom(list, n, rng) {
@@ -763,7 +799,12 @@ const GAME = (function () {
     switch (choice.act) {
       case 'fight':
         /* ステータスの合計が10以上、または、装備と仲間のランクの合計が4以上で突破。満たせなければ、仲間を1人奪われる */
-        if (total(run) >= 10 || equipSum(run) + allyPower(run) >= 4) return { msg: tx('装備を構えて斬り結ぶと、ライバルは尻もちをついた。\n「くそっ…通れ!」'), pass: true };
+        if (total(run) >= 10 || equipSum(run) + allyPower(run) >= 4) {
+          const up = bumpItem(run, rng);                      // 突破すると、ステータス計2 + いずれかの装備が1ランク上がる
+          const r = { msg: tx('装備を構えて斬り結ぶと、ライバルは尻もちをついた。\n「くそっ…通れ!」'), fx: statFx(rng, 2), pass: true };
+          if (up) { r.items = [up]; r.msg += '\n' + tx('戦いの中で、装備が馴染んで一段上の品になった。'); }
+          return r;
+        }
         if (!run.allies.length) return { end: '023' };      // 力が足りず、奪われる仲間もいない
         return { msg: tx('力が及ばず、あっさり押し負けた。\nライバルは勝ち誇って、仲間を1人引き抜いて、道を空けた。'),
           loseAlly: true, pass: true };
@@ -774,10 +815,10 @@ const GAME = (function () {
         if (hasRank(run, 2)) return { msg: tx('「装備が貧弱だな」と鼻で笑われた。\n自信をなくして、とぼとぼと通り抜けた。'), fx: allFx(-1), pass: true };
         return { end: '024' };                                // 下位の装備だけでは、相手にされない
       case 'presence':
-        if (total(run) >= 8) return { msg: tx('地力の違いに、ライバルはたじろいだ。\n「…通れ」'), pass: true };
+        if (total(run) >= 8) return { msg: tx('地力の違いに、ライバルはたじろいだ。\n「…通れ」'), fx: statFx(rng, 3), pass: true };
         return { msg: tx('地力が足りず、取り囲まれた。\n装備を置いていくことで、通してもらえた。'), loseEquip: true, pass: true };
       case 'janken':
-        if (rng() < 0.5) return { msg: tx('じゃんけんぽん。勝った。\n「くそっ、三回勝負だ!」と言われたが、構わず通り抜けた。'), pass: true };
+        if (rng() < 0.5) return { msg: tx('じゃんけんぽん。勝った。\n「くそっ、三回勝負だ!」と言われたが、構わず通り抜けた。'), fx: statFx(rng, 1), gold: 10, pass: true };
         return { end: '021' };
       case 'allin':
         return { msg: tx('有り金を差し出すと、ライバルは目を丸くして道を空けた。\n(銀貨が0枚でも、気持ちは伝わった。)'), gold: -run.money, pass: true };
@@ -832,14 +873,22 @@ const GAME = (function () {
           return { end: card.defeatEnd };
         }
         const loot = 1 + Math.floor(rng() * 3);                // 勝つと、1〜3銀貨を得る
-        if (rng() < 0.5) {
-          const s = randStat(rng), fx = {};
-          fx[s.key] = t;
-          return { msg: tx('{w}を倒した!\n戦いの中で、{s}が磨かれた。', { w: card.who, s: s.label }), fx: fx, gold: loot };
+        /* 上: 上装備 + ステータス計2 / 中: 中装備 + ステータス計1 / 下: どちらかが無装備なら50%で下装備、それ以外はステータス計2。装備の部位は完全にランダム */
+        let it = null, fx = null;
+        if (t === 3) { it = pickItem(run, 3, rng); fx = monsterFx(card, 2, rng); }
+        else if (t === 2) { it = pickItem(run, 2, rng); fx = monsterFx(card, 1, rng); }
+        else {
+          const empty = ['weapon', 'armor'].some(function (sl) { return !slotItem(run, sl); });
+          if (empty && rng() < 0.5) it = pickItem(run, 1, rng);
+          else fx = monsterFx(card, 2, rng);
         }
-        const slot = rng() < 0.5 ? 'weapon' : 'armor';
-        const it = ITEMS[(slot === 'weapon' ? 'w' : 'a') + t];
-        return gain(run, it, tx('{w}を倒した!\n戦利品として、{n}を手に入れた。', { w: card.who, n: it.name }), { gold: loot });
+        let msg = tx('{w}を倒した!', { w: card.who });
+        if (it) msg += '\n' + tx('戦利品として、{n}を手に入れた。', { n: it.name });
+        if (fx) msg += '\n' + tx(it ? 'さらに、戦いの中で能力が磨かれた。' : '戦いの中で、能力が磨かれた。');
+        const res = { msg: msg, gold: loot, xp: t };
+        if (it) res.items = [it];
+        if (fx) res.fx = fx;
+        return res;
       }
       case 'hide': {
         const s = randStat(rng), fx = {};
@@ -851,16 +900,18 @@ const GAME = (function () {
         return { msg: tx('物陰に隠れて、やり過ごした。\n息を潜めるうちに、{s}が研ぎ澄まされた。', { s: s.label }), fx: fx };
       }
       case 'guard': {
-        if (t >= 2 && rankOf(run, 'armor') < t) return { end: '026' };      // 上には上の防具、中には中の防具が要る
+        /* 武器か防具のどちらか単体が、魔物のランク以上なら成功(合算はしない) */
+        if (t >= 2 && Math.max(rankOf(run, 'weapon'), rankOf(run, 'armor')) < t) return { end: '026' };
         const s = randStat(rng), fx = {};
         fx[s.key] = 2;
         return { msg: tx('身を固めて、攻撃を受け止めた。\n{s}が鍛えられた気がする。', { s: s.label }), fx: fx };
       }
       case 'mstat': {
+        if (run.stats[choice.stat] <= 0) return { end: '025' };    // 該当ステータスが0以下なら、判定の前に必ず敗北(どの魔物でも同じ)
         const power = run.stats[choice.stat] + equipSum(run) + allyPower(run);
-        if (power >= MTHRESH[t]) return { msg: MSTAT[choice.stat].win.replace('{w}', card.who) };
-        if (t === 1) return { msg: tx('{w}にはまるで通用しなかった。\n逃げ帰る途中で、気力が下がった。', { w: card.who }), fx: allFx(-1) };
-        return { end: card.defeatEnd };
+        if (power >= MTHRESH[t]) { const fx = {}; fx[choice.stat] = 4; return { msg: MSTAT[choice.stat].win.replace('{w}', card.who), fx: fx, xp: t }; }
+        const lose = {}; lose[choice.stat] = -2;                 // それ以外の失敗は、ステータスが下がるだけ
+        return { msg: tx('{w}にはまるで通用しなかった。\n逃げ帰る途中で、気力が下がった。', { w: card.who }), fx: lose };
       }
       case 'dream':
         return { end: '028' };
@@ -969,10 +1020,24 @@ const GAME = (function () {
       run.allies.forEach(function (a) { o.notes.push({ t: tx('仲間 {n}', { n: a.name }), v: -1 }); });
       run.allies = [];
     }
-    if (o.ally) { run.allies.push(o.ally); o.notes.push({ t: tx('仲間 {n}', { n: o.ally.name }), v: 1 }); }
+    if (o.ally) { run.allies.push(Object.assign({}, o.ally, { xp: 0 })); o.notes.push({ t: tx('仲間 {n}', { n: o.ally.name }), v: 1 }); }
     if (o.loseAlly && run.allies.length) {
       run.allies.sort(function (a, b) { return b.power - a.power; });               // 一番強い仲間を取られる
       o.notes.push({ t: tx('仲間 {n}', { n: run.allies.shift().name }), v: -1 });
+    }
+    if (o.xp) {
+      const hasVetTraveler = run.allies.some(function (a) { return a.key === 'strong'; });
+      run.allies = run.allies.map(function (a) {
+        const r = (!a.vet && RANKUP[a.key]) || null;
+        if (!r) return a;
+        const xp = (a.xp || 0) + o.xp;
+        /* 歴戦の旅人が既にいる時、ひよっこは昇格しない(歴戦のライバルへの昇格は、常に行う) */
+        if (xp < r.need || (a.key === 'weak' && hasVetTraveler)) return Object.assign({}, a, { xp: xp });
+        const up = Object.assign({}, r.to, { xp: xp });
+        o.notes.push({ t: tx('仲間 {n}', { n: up.name }), v: 1, s: tx(' 昇格') });
+        o.msg = (o.msg || '') + '\n' + tx('{a}が成長した!\n「{n}」に昇格した。', { a: a.name, n: up.name });
+        return up;
+      });
     }
     if (o.silence) run.silence += 1;
   }
