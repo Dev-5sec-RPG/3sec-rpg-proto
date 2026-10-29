@@ -490,3 +490,38 @@ html, body { overflow-x: hidden; overflow-x: clip; }
 .count-line { text-align: center; }
 
 .c-note { margin: 0; font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
+
+/* ---- お知らせ・ブログ ---- */
+.doc h3 + table, .doc p + table { margin: 0; }
+.doc table { border-collapse: collapse; font-size: 14px; width: 100%; }
+.doc th, .doc td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+.doc th { background: var(--tile); color: var(--tile-ink); font-weight: normal; }
+.doc ol { margin: 0; padding-left: 1.5em; font-size: 15px; }
+.doc a.back { display: inline-block; margin-top: 6px; }
+.post-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.post-link { display: block; padding: 12px 14px; background: var(--panel); border: 2px solid var(--line); border-radius: 10px; color: var(--ink); text-decoration: none; word-break: normal; }
+.post-link:hover { border-color: var(--accent); }
+.post.pinned .post-link { border-color: var(--accent); }
+.post-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.post-title { margin: 6px 0 4px; font-size: 17px; font-weight: normal; line-height: 1.5; }
+.post-ex { margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.7; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; background: var(--tile); color: var(--tile-ink); border: 1px solid var(--line); }
+.tag-news { background: #ffe3c2; color: #5a3000; }
+.tag-blog { background: #d6e6ff; color: #12306a; }
+.tag-log { background: #d8f2e2; color: #0d4d2d; }
+.pin-mark { font-size: 12px; color: var(--accent); }
+.new { display: inline-block; padding: 0 7px; border-radius: 4px; font-size: 11px; background: var(--bad); color: #fff; letter-spacing: .05em; }
+.new[hidden] { display: none; }
+.pager { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 14px 0 4px; font-size: 14px; }
+.pager a, .pager span { padding: 4px 12px; border: 2px solid var(--line); border-radius: 8px; color: var(--ink); text-decoration: none; }
+.pager .cur { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.log-day h3 { margin-top: 14px; }
+.guide-links { margin: 10px 0 0; font-size: 13px; }
+.guide-links ul { margin: 4px 0 0; padding-left: 1.2em; line-height: 1.9; }
+.guide-links a { color: var(--accent); }
+.doc .post-list { padding-left: 0; }
+.doc a.post-link { color: var(--ink); word-break: normal; }
+.doc .post-title { border-left: 0; padding-left: 0; margin: 6px 0 4px; font-size: 17px; }
+.doc .post-ex { font-size: 14px; }
+.doc .log-day ul { margin-top: 6px; }
