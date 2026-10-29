@@ -29,10 +29,15 @@
   function shareText() {
     return tx('『{g}』でNo.{c}のエンドに到達しました！\nエンドタイトルは『{n}』でした！', { g: gameName, c: code, n: endName });
   }
+  /* 日本語は、本文・URL・空白行・ハッシュタグの順に、本文へまとめる(誤タップを避けるため、ハッシュタグの前に1行空ける)。英語は、従来どおり */
+  const HASHTAGS = (typeof I18N !== 'undefined' && I18N.lang === 'ja') ? '#3秒即断RPG #スマホゲーム' : '';
+  function shareBody(u) {
+    return shareText() + (u ? '\n' + u : '') + (HASHTAGS ? '\n\n' + HASHTAGS : '');
+  }
   const shareBtn = document.getElementById('shareBtn');
   if (shareBtn && !main.getAttribute('data-site')) {
     const u = topUrl();
-    if (u) shareBtn.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText()) + '&url=' + encodeURIComponent(u);
+    if (u) shareBtn.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(HASHTAGS ? shareBody(u) : shareText()) + (HASHTAGS ? '' : '&url=' + encodeURIComponent(u));
   }
 
   C.updateCollect();
@@ -281,7 +286,7 @@
     const vs = wrapEl.querySelector('#vShare');
     if (vs) vs.addEventListener('click', function () {
       const u = topUrl();
-      const data = { files: [file], text: shareText() + (u ? '\n' + u : '') };
+      const data = { files: [file], text: shareBody(u) };
       navigator.share(data).catch(function () { /* 取り消しは何もしない */ });
     });
     wrapEl.querySelector('.btn').focus();

@@ -6,7 +6,7 @@
   const FREEZE_MS = 200;                                       // 選んだあと、「選べた」ことを確認させる間
   const rng = function () { return DEV ? DEV.rng() : Math.random(); };
   const SHOWN = G.TIME_LIMIT;                                  // 画面に出る秒数(3.0)
-  const LIMIT = (typeof window.__LIMIT === 'number') ? window.__LIMIT : G.TIME_LIMIT * G.TIME_SCALE;   // 実際の制限(3.6秒)
+  const LIMIT = (typeof window.__LIMIT === 'number') ? window.__LIMIT : G.TIME_LIMIT * ((typeof I18N !== 'undefined' && I18N.lang === 'en') ? 1.25 : G.TIME_SCALE);   // 実際の制限(日本語3.6秒/英語3.75秒。表示はどちらも3.0秒)
   const SCALE = LIMIT / SHOWN;                                  // 表示の進みは、実時間より少しゆっくり
   let pipLabels = ['A'], pipOf = [];
   const $ = function (s) { return document.querySelector(s); };

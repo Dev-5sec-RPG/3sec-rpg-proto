@@ -544,7 +544,7 @@ const GAME = (function () {
      bonus=通過したときの報酬(fx=ステータス / gold=所持金)。全ステータスが0以下だと、always と never 以外は、どれを選んでもエンド。 */
   const FORCED_B = {
     id: 'B', forced: true, icon: 'p_gate', who: tx('関所の門番'), q: tx('「止まれ。通行の理由を述べよ」'),
-    showCount: 4,
+    showCount: 4, topStat: true,       // topStat: 出会った時点で、いちばん高いステータスの選択肢を、必ず1つ出す
     choices: [
       { label: tx('総合力で押し通る'), fixed: true, gate: { type: 'total', min: 6, fail: '010',
         bonus: { fx: { courage: 1 }, gold: 2, msg: tx('総合力で押し通った。\n門番は、何も言えなかった。') } } },
@@ -738,7 +738,10 @@ const GAME = (function () {
     const out = card.choices.filter(function (c) { return c.fixed; });
     const pool = card.choices.filter(function (c) { return !c.fixed; });
     // 選択肢に w があれば、出やすさに反映する(なければ1)
-    return Object.assign({}, card, { choices: out.concat(drawFrom(pool, card.showCount - out.length, rng)) });
+    const drawn = drawFrom(pool, card.showCount - out.length, rng);
+    const copy = Object.assign({}, card, { choices: out.concat(drawn) });
+    if (card.topStat) { copy.fixedPart = out; copy.pool = pool; copy.drawn = drawn; copy.tieRoll = rng(); }   // 出会った時に、ステータスを見て組み直す(encounter)
+    return copy;
   }
   /* 1回分の進行表: ランダムB → イベントB → 街 → ランダムC → イベントC → 道中 → ランダムD → イベントD */
   function buildQueue(rng) {
@@ -759,6 +762,18 @@ const GAME = (function () {
   /* カードに出会った時に、裏でフラグを立てる */
   function encounter(run, card) {
     if (card.flag) run.flags[card.flag] = true;
+    if (card.topStat && card.drawn) card.choices = withTopStat(run, card);
+  }
+  /* 関所: 固定(総合力) + いちばん高いステータスの選択肢(同点なら、そのうちの1つ。基準に届いていなくても出す) + 残りは、最初に引いた順のランダム */
+  function withTopStat(run, card) {
+    const best = Math.max.apply(null, STATS.map(function (s) { return run.stats[s.key]; }));
+    const tops = STATS.filter(function (s) { return run.stats[s.key] === best; });
+    const key = tops[Math.floor(card.tieRoll * tops.length) % tops.length].key;
+    const top = card.pool.filter(function (c) { return c.gate && c.gate.type === 'stat' && c.gate.stat === key; })[0];
+    const want = card.showCount - card.fixedPart.length;          // ランダムで引く枠の数(3)
+    if (!top || want < 1) return card.choices;
+    const rest = card.drawn.filter(function (c) { return c !== top; }).slice(0, want - 1);
+    return card.fixedPart.concat([top], rest);
   }
 
   /* ---- 判定 ---- */
