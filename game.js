@@ -205,7 +205,13 @@
   }
   function leaveTap() { tapGo = null; stage.classList.remove('is-tap'); }
   const INTERACTIVE = 'a, button, summary, details, input, select, textarea, label';
+  /* 連続タップで文字が選択されて、画面が青くなるのを防ぐ */
+  document.addEventListener('selectstart', function (ev) {
+    const t = ev.target && ev.target.nodeType === 1 ? ev.target : (ev.target && ev.target.parentElement);
+    if (t && t.closest && t.closest('.app.game') && !t.closest(INTERACTIVE)) ev.preventDefault();
+  });
   document.addEventListener('click', function (ev) {
+    try { const sel = window.getSelection && window.getSelection(); if (sel && !sel.isCollapsed) sel.removeAllRanges(); } catch (e) { /* 表示だけの処理 */ }
     if (phase !== 'tap' || !tapGo) return;
     if (ev.target.closest && ev.target.closest(INTERACTIVE)) return;
     tapGo();
