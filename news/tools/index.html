@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>個人開発者がブラウザゲームを作るために使用したツール｜3秒即断RPG</title>
+<meta name="description" content="「3秒即断RPG」は、プログラミングの経験がない個人が、ほぼ無料の環境だけで作ったブラウザゲームです。この記事では、制作に使ったツールと、そこで躓いた点を紹介します。">
+<link rel="canonical" href="https://3sec-rpg.com/news/tools/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="個人開発者がブラウザゲームを作るために使用したツール">
+<meta property="og:description" content="「3秒即断RPG」は、プログラミングの経験がない個人が、ほぼ無料の環境だけで作ったブラウザゲームです。この記事では、制作に使ったツールと、そこで躓いた点を紹介します。">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://3sec-rpg.com/img/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"個人開発者がブラウザゲームを作るために使用したツール","datePublished":"2026-10-30","inLanguage":"ja","mainEntityOfPage":"https://3sec-rpg.com/news/tools/"}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-50ZVKWN1C8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-50ZVKWN1C8');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>html{background:#e8ebf6}@media (prefers-color-scheme:dark){html{background:#0e1124}}</style>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<main class="app" data-root="../../">
+  <header class="top"><a class="brand-link" href="../../index.html"><h1 class="brand">3秒即断RPG</h1></a><a class="collect" href="../../index.html">遊ぶ</a></header>
+  <article class="doc">
+    <h2>個人開発者がブラウザゲームを作るために使用したツール</h2>
+    <div class="post-meta"><span class="tag tag-blog">ブログ</span><time datetime="2026-10-30">2026年10月30日</time><span class="new" data-date="2026-10-30" hidden>NEW</span></div>
+<p>「3秒即断RPG」は、プログラミングの経験がない個人が、ほぼ無料の環境だけで作ったブラウザゲームです。この記事では、制作に使ったツールと、そこで躓いた点を紹介します。同じように「作ってみたいが、お金も知識もない」という方の参考になれば幸いです。</p>
+
+<h3>ゲームの中身はClaudeの無料版で作りました</h3>
+<p>企画、シナリオ、プログラムの作成から修正まで、中心になったのはAIのClaude(無料版)です。私はコードを書けません。そのため、作りたい内容を日本語で伝え、返ってきたものを確認し、直してもらうという流れを繰り返しました。</p>
+<p>無料版には利用回数の上限があります。そのため、一度の依頼に要望をまとめる、動作を確認してから次の依頼に進む、といった工夫が必要でした。</p>
+
+<h3>立ち絵はGeminiで作りました</h3>
+<p>ゲームのチェックポイントを明確にするため、また、単調なゲーム性から脱却するために、門番、ライバル、魔王のタイミングで、このゲームには相応しくないような綺麗な絵を差し込みたくなりました。ギャップとして、ユーザーにいい印象を与えられていればと思います。</p>
+<p>この作業は難航しました。Claudeは画像生成が苦手で、思うような絵が出てきません。やむを得ずClaudeから離れ、Gemini(無料版)で生成しました。雰囲気を揃えるため、指示文を何度も練り直しています。</p>
+
+<h3>レンタルサーバーも検討しましたが</h3>
+<p>ブラウザゲームを公開するには、通常はサーバーが必要です。しかし私は素人で、サーバーの使い方もよく分からず、そもそもセキュリティも心配でした。そこで、サーバー不要な構造を目指しました。</p>
+<p>本作は、サーバー側で処理をしない静的なサイトです。無料で使えるGitHubの公開機能(GitHub Pages)を利用することにしました。完成したファイルをGitHubにアップロードすれば、世界中から遊べる状態になります。サーバーが必要な仕組みだったなら、公開まで漕ぎつけていなかったような気がします。</p>
+
+<h3>その後、ドメインを取得しました</h3>
+<p>GitHubの標準のURLのままでも公開はできます。ただ、覚えやすいアドレスにするために、独自ドメイン「3sec-rpg.com」を取得しました。ドメインについてもよく分からないままでしたが、「インターネット上の住所」として理解したことにしました。取得にはエックスサーバーのドメインサービスを使っています。取得したドメインとGitHubをつなぐ作業は、初めてのうちは用語が分からず、特に時間がかかりました。</p>
+
+<h3>告知</h3>
+<p>告知にはXとThreadsを使っています。リンクを貼った時に画像が表示されない問題など、公開後に分かる不具合もありました。</p>
+<ul>
+<li>X: <a href="https://x.com/3sec_RPG_Dev" target="_blank" rel="noopener">@3sec_RPG_Dev</a></li>
+<li>Threads: <a href="https://www.threads.net/@3sec.rpg.dev" target="_blank" rel="noopener">@3sec.rpg.dev</a></li>
+</ul>
+
+<h3>素人の試行錯誤について</h3>
+<p>ここまでは順調に見えるかもしれませんが、実際は失敗の連続でした。画面の崩れ、英語版の文面の長さ、スマホでの押しやすさなど、作ってみて初めて気づく点が多くありました。そのたびにClaudeに相談し、直し、確かめる。この繰り返しで、少しずつ形になっています。</p>
+<p>専門知識がなくても、道具を組み合わせれば、ゲームを公開するところまでは進められることが分かりました。この記事が、何かをしてみたいどなたかの助けになればと思います。</p>
+    <p><a class="back" href="../index.html">← お知らせ・ブログ一覧へ</a></p>
+  </article>
+  <footer class="foot"><nav><a href="../../news/index.html">お知らせ・ブログ</a><a href="../../privacy/index.html">プライバシーポリシー</a><a href="../../contact/index.html">お問い合わせ</a><a class="lang-sw" href="../../en/index.html" hreflang="en" lang="en">English</a></nav><small>© 2026 3秒即断RPG</small></footer>
+</main>
+<script>(function(){try{var n=document.querySelectorAll(".new[data-date]");var t=Date.now();for(var i=0;i<n.length;i++){var d=new Date(n[i].getAttribute("data-date")+"T00:00:00+09:00").getTime();var k=Math.floor((t-d)/86400000);if(k>=0&&k<7)n[i].hidden=false;}}catch(e){}})();</script>
+</body>
+</html>

@@ -1,8 +1,10 @@
 /* ====== 全ページ共通(記録の保存、ページの行き先、ドット絵) ====== */
 const COMMON = (function () {
+  const BASE = (typeof document !== 'undefined' && document.currentScript && document.currentScript.src) || (typeof location !== 'undefined' ? location.href : '');
   const KEY = 'sansec_rpg_codex_v3';   // 図鑑(到達したエンド)
   const LAST = 'sansec_rpg_last_v3';   // 直近の結果(ステータス・履歴)
   const BKEY = 'sansec_rpg_badges_v1'; // 獲得したバッジ
+  const SKINKEY = 'sansec_rpg_skin_v1'; // バッジ特典(見た目)の選択
   const DEV = 'sansec_dev_v1';         // 開発者モード(タブを閉じると解除。sessionStorage)
   const DEVPRESET = 'sansec_dev_preset_v1';
   const DEVTRACE = 'sansec_dev_trace_v1';
@@ -70,6 +72,33 @@ const COMMON = (function () {
     return fresh;
   }
 
+
+  /* --- バッジ特典(見た目の切り替え) ---
+     bg: 背景色(B05) / frame: 窓と選択肢の枠(B10) / scene: 背景の絵(B20) / chara: キャラクターの絵(B30: 細密なドット絵 / B40: イラスト)
+     獲得していないバッジの特典は、選んであっても、使われない */
+  const SKIN_DEFAULT = { bg: 'default', frame: 'default', scene: 'off', chara: 'dot' };
+  const SKIN_NEED = { bg: 'B05', frame: 'B10', scene: 'B20', chara: 'B30' };
+  const SKIN_OPTS = { bg: ['default', 'yellow', 'red', 'green'], frame: ['default', 'silver'], scene: ['off', 'on'], chara: ['dot', 'fine', 'art'] };
+  const SKIN_NEED_VAL = { fine: 'B30', art: 'B40' };      // 選択肢ごとに必要なバッジ(ここに無いものは、SKIN_NEED)
+  function loadSkin() {
+    const v = read(SKINKEY), out = Object.assign({}, SKIN_DEFAULT);
+    if (v && typeof v === 'object') Object.keys(SKIN_DEFAULT).forEach(function (k) { if (SKIN_OPTS[k].indexOf(v[k]) >= 0) out[k] = v[k]; });
+    return out;
+  }
+  function saveSkin(v) { write(SKINKEY, v); }
+  function skinValue(kind) {
+    const v = loadSkin()[kind], bd = loadBadges();
+    if (v === SKIN_DEFAULT[kind]) return v;
+    if (bd[SKIN_NEED_VAL[v] || SKIN_NEED[kind]]) return v;
+    if (kind === 'chara' && v === 'art' && bd[SKIN_NEED.chara]) return 'fine';      // B40が無い時は、B30の絵にとどめる
+    return SKIN_DEFAULT[kind];
+  }
+  function applySkin() {
+    if (typeof document === 'undefined' || !document.body || !document.body.setAttribute) return;
+    Object.keys(SKIN_DEFAULT).forEach(function (k) { document.body.setAttribute('data-' + k, skinValue(k)); });
+    document.documentElement.setAttribute('data-bg', skinValue('bg'));      // 画面の端まで同じ色にするため、html にも付ける
+  }
+
   /* --- 開発者モード(同じタブの中でだけ有効) --- */
   function sread(key) { try { const raw = sessionStorage.getItem(key); if (raw) return JSON.parse(raw); } catch (e) { /* 使えない環境 */ } return null; }
   function swrite(key, v) { try { if (v == null) sessionStorage.removeItem(key); else sessionStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* 同上 */ } }
@@ -111,9 +140,7 @@ const COMMON = (function () {
     if (el) el.textContent = tx('収集 {c}/{t}', { c: Object.keys(loadCodex()).length, t: Object.keys(GAME.ENDS).length });
   }
 
-  function pixelSVG(key) {
-    const rows = GAME.ART[key];
-    if (!rows) return '';
+  function drawRows(rows, colorOf) {
     const h = rows.length, w = rows[0].length;
     let rects = '';
     rows.forEach(function (row, y) {
@@ -123,12 +150,33 @@ const COMMON = (function () {
         if (ch === '.') { x++; continue; }
         let x2 = x;
         while (x2 < w && row[x2] === ch) x2++;
-        rects += '<rect x="' + x + '" y="' + y + '" width="' + (x2 - x) + '" height="1" fill="' + GAME.PALETTE[ch] + '"/>';
+        rects += '<rect x="' + x + '" y="' + y + '" width="' + (x2 - x) + '" height="1" fill="' + colorOf(ch) + '"/>';
         x = x2;
       }
     });
     return '<svg viewBox="0 0 ' + w + ' ' + h + '" shape-rendering="crispEdges" aria-hidden="true">' + rects + '</svg>';
   }
+  /* イラスト(B40の特典)。背景が透明のWebP。img/c/ に置く */
+  const ART_IMG = ['p_merchant', 'p_dog', 'p_traveler', 'p_traveler2', 'p_monk', 'p_child', 'p_king', 'p_inn', 'p_spring', 'p_bard', 'p_changer', 'p_wsmith', 'p_asmith', 'p_legend', 'p_gate', 'p_rival', 'p_demon', 'p_general', 'p_slime', 'p_bat', 'p_orc', 'p_skel', 'p_wyvern', 'chest'];
+  const artUrl = function (k) { return new URL('img/c/' + (k === 'p_traveler' ? 'p_traveler1' : k) + '.webp', BASE).href; };
+  function preloadArt() {
+    if (typeof Image === 'undefined' || skinValue('chara') !== 'art') return;
+    ART_IMG.forEach(function (k) { const i = new Image(); i.src = artUrl(k); });
+  }
+  function pixelSVG(key) {
+    if (ART_IMG.indexOf(key) >= 0 && skinValue('chara') === 'art') {
+      return '<img class="art-img" src="' + artUrl(key) + '" alt="" decoding="async" draggable="false">';
+    }
+    if (typeof SPR24 !== 'undefined' && SPR24[key] && skinValue('chara') === 'fine') {     // 細密な絵(B30の特典)
+      return drawRows(SPR24[key].r, function (ch) { return SPR24[key].p[ch]; });
+    }
+    const rows = GAME.ART[key];
+    if (!rows) return '';
+    return drawRows(rows, function (ch) { return GAME.PALETTE[ch]; });
+  }
+
+  applySkin();
+  if (typeof window !== 'undefined') window.addEventListener('load', function () { setTimeout(preloadArt, 600); });
 
   return {
     loadCodex: loadCodex, saveCodex: saveCodex, loadLast: loadLast, saveLast: saveLast,
@@ -136,6 +184,7 @@ const COMMON = (function () {
     loadBadges: loadBadges, saveBadges: saveBadges, grantBadges: grantBadges,
     devOn: devOn, setDev: setDev, devPreset: devPreset, setDevPreset: setDevPreset, devTrace: devTrace, setDevTrace: setDevTrace,
     badgeUrl: badgeUrl, devUrl: devUrl,
-    endUrl: endUrl, homeUrl: homeUrl, codexUrl: codexUrl, updateCollect: updateCollect, pixelSVG: pixelSVG
+    endUrl: endUrl, homeUrl: homeUrl, codexUrl: codexUrl, updateCollect: updateCollect, pixelSVG: pixelSVG,
+    loadSkin: loadSkin, saveSkin: saveSkin, skinValue: skinValue, applySkin: applySkin, SKIN_OPTS: SKIN_OPTS
   };
 })();

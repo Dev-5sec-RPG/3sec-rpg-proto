@@ -506,7 +506,7 @@ const GAME = (function () {
   }
   function makeTraveler(allyKey, price, q, who, abductNeed) {
     return {
-      id: 'trav_' + allyKey, sec: 'C', kind: 'traveler', w: 1, icon: 'p_traveler', who: who, q: q,
+      id: 'trav_' + allyKey, sec: 'C', kind: 'traveler', w: 1, icon: allyKey === 'strong' ? 'p_traveler2' : 'p_traveler', who: who, q: q,
       choices: [
         { label: tx('雇う'), act: 'hire', ally: allyKey, price: price },
         { label: tx('頼み込む'), act: 'plead', ally: allyKey },
@@ -1070,6 +1070,7 @@ const GAME = (function () {
       return row.replace(/[RQMWS]/g, function (c) { return m[c]; });
     });
   }
+  ART.p_traveler2 = ART.p_traveler;      // 歴戦の旅人。ドット絵は同じ(イラストだけ別の絵)
   ART.badge_B05 = medal({ M: 'o', W: 'c', S: 'n', R: 'r', Q: 'r' });
   ART.badge_B10 = medal({ M: 'a', W: 'w', S: 'd', R: 'b', Q: 'b' });
   ART.badge_B20 = medal({ M: 'y', W: 'c', S: 'o', R: 'r', Q: 'r' });
