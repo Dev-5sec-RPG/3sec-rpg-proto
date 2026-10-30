@@ -940,7 +940,7 @@ const GAME = (function () {
     if (stage === 1) {
       switch (choice.act) {
         case 'bfight':
-          if (equipMid(run) || total(run) >= 12 || allyOk(run)) return { msg: tx('渾身の一撃が、魔王に届いた。\n魔王が、わずかによろめいた。'), next: true };
+          if (equipMid(run) || total(run) >= 12 || allyOk(run)) return { msg: tx('渾身の一撃が、魔王に届いた。\n魔王が、わずかによろめいた。'), next: true, good: true };
           return { end: '029', why: tx('魔王に通用する力がなかった。') };
         case 'bflee': {
           const o = { msg: tx('背を向けて逃げ出した。\nだが、魔王に回り込まれた。'), fx: allFx(-1), loseAllAllies: true, next: true };
@@ -951,10 +951,10 @@ const GAME = (function () {
           if (run.allies.length) return { msg: tx('「行け、仲間たちよ!」\n仲間は魔王に挑んだが、やられてしまった。'), loseAllAllies: true, next: true };
           return { end: '030' };
         case 'bchat':
-          if (run.stats.improv + run.stats.charm >= 6) return { msg: tx('天気の話で、なぜか盛り上がった。\n魔王が、ふと油断した。'), next: true };
+          if (run.stats.improv + run.stats.charm >= 6) return { msg: tx('天気の話で、なぜか盛り上がった。\n魔王が、ふと油断した。'), next: true, good: true };
           return { end: '031' };
         case 'bsing':
-          if (run.stats.courage + run.stats.caution >= 6) return { msg: tx('渾身の歌声が、魔王城に響いた。\n魔王が、耳をふさいでうずくまった。'), next: true };
+          if (run.stats.courage + run.stats.caution >= 6) return { msg: tx('渾身の歌声が、魔王城に響いた。\n魔王が、耳をふさいでうずくまった。'), next: true, good: true };
           return { end: '032' };
         case 'bmug':
           if (run.money >= 20) return { end: '044' };       // 20銀貨以上なら、賄賂として喜ばれ、和平条約へ

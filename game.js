@@ -299,6 +299,7 @@
   function feedback(out, timedOut) {
     if (out.end) return;
     if (curCard && curCard.id === 'trav_max') { SFX.play('legendPick'); return; }   // 伝説の旅人だけは、専用の音
+    if (out.good && !timedOut) { SFX.play('rise'); return; }      // 魔王戦の1回目を、ステータスの変動なしで突破した時も「いい音」
     /* 関所・ライバルを抜けたら「いい音」。ただし、ステータスが下がる・装備や仲間を奪われる突破は、悪い音 */
     if (out.pass) {
       const lost = out.loseEquip || out.loseAlly || (out.fx && Object.keys(out.fx).some(function (k) { return out.fx[k] < 0; }));
