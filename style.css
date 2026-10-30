@@ -571,6 +571,20 @@ body[data-scene="on"] .stage .window,
 body[data-scene="on"] .stage .choice {
   background: color-mix(in srgb, var(--panel) 80%, transparent);
 }
+/* 背景の絵の上の文字(窓と選択肢の外)。背景の明るさに合わせた色にして、逆の色で縁取る */
+body[data-scene="on"] .app > :not(.stage),
+body[data-scene="on"] .stage .clock {
+  --ink: #1b1e3b; --ink-soft: #2f3560; --line: rgba(27, 30, 59, .55); --accent: #3a45d1;
+  --halo: rgba(255, 255, 255, .95);
+  color: var(--ink);
+  text-shadow: 0 0 2px var(--halo), 0 0 4px var(--halo), 1px 1px 0 var(--halo), -1px -1px 0 var(--halo), 1px -1px 0 var(--halo), -1px 1px 0 var(--halo);
+}
+body[data-scene="on"][data-scenename="castle"] .app > :not(.stage),
+body[data-scene="on"][data-scenename="castle"] .stage .clock {
+  --ink: #f6f3ff; --ink-soft: #ddd8ee; --line: rgba(246, 243, 255, .6); --accent: #f0c050;
+  --halo: rgba(8, 6, 20, .95);
+}
+body[data-scene="on"] .app > :not(.stage) a { color: var(--accent); }
 /* 背景色・背景の絵を使う時は、窓と選択肢以外(ヘッダー・ステータス・カウントダウンなど)は、塗りをやめて、文字だけを載せる */
 body:not([data-bg="default"]) .stat, body[data-scene="on"] .stat,
 body:not([data-bg="default"]) .clock-bar, body[data-scene="on"] .clock-bar { background: transparent; }

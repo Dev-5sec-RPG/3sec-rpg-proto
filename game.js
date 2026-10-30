@@ -365,6 +365,7 @@
     if (!sceneEl || name === sceneName) return;
     const first = sceneName === null;
     sceneName = name;
+    document.body.setAttribute('data-scenename', name);      // 文字の色を、背景に合わせて変えるため
     if (first) { sceneEl.innerHTML = SCENES[name]; return; }
     sceneEl.classList.add('out');
     setTimeout(function () { sceneEl.innerHTML = SCENES[name]; sceneEl.classList.remove('out'); }, 300);
