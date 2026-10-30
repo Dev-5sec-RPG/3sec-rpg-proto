@@ -53,7 +53,7 @@
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background: var(--page-bg, var(--bg));
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-d);
   font-size: 17px;
@@ -248,7 +248,6 @@ body.hit-fail .app { animation: shake .56s linear; }
 
 /* ---- キャラクターのアイコン ---- */
 .portrait svg { display: block; width: 68px; height: 68px; }
-.portrait img.art-img { display: block; width: 68px; height: 68px; object-fit: contain; }
 
 /* ---- 図鑑: 区切りとヒント ---- */
 .c-sec { display: grid; gap: 8px; margin-top: 6px; }
@@ -531,59 +530,3 @@ html, body { overflow-x: hidden; overflow-x: clip; }
 .doc .post-title { border-left: 0; padding-left: 0; margin: 6px 0 4px; font-size: 17px; }
 .doc .post-ex { font-size: 14px; }
 .doc .log-day ul { margin-top: 6px; }
-
-
-/* ====== バッジ特典(見た目)。バッジのページで選ぶ ====== */
-/* B05: 背景色。ページの背景だけ変える(窓や選択肢の色は、そのまま)。html と body の両方に、同じ色を付ける */
-html[data-bg="yellow"], body[data-bg="yellow"] { --page-bg: #f4eecb; background: #f4eecb; }
-html[data-bg="red"], body[data-bg="red"] { --page-bg: #f4dcdc; background: #f4dcdc; }
-html[data-bg="green"], body[data-bg="green"] { --page-bg: #dcf0dc; background: #dcf0dc; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"])[data-bg="yellow"], :root:not([data-theme="light"]) body[data-bg="yellow"] { --page-bg: #2a2810; background: #2a2810; }
-  :root:not([data-theme="light"])[data-bg="red"], :root:not([data-theme="light"]) body[data-bg="red"] { --page-bg: #2e1316; background: #2e1316; }
-  :root:not([data-theme="light"])[data-bg="green"], :root:not([data-theme="light"]) body[data-bg="green"] { --page-bg: #10281a; background: #10281a; }
-}
-:root[data-theme="dark"][data-bg="yellow"], :root[data-theme="dark"] body[data-bg="yellow"] { --page-bg: #2a2810; background: #2a2810; }
-:root[data-theme="dark"][data-bg="red"], :root[data-theme="dark"] body[data-bg="red"] { --page-bg: #2e1316; background: #2e1316; }
-:root[data-theme="dark"][data-bg="green"], :root[data-theme="dark"] body[data-bg="green"] { --page-bg: #10281a; background: #10281a; }
-
-/* B10: 窓と選択肢の、シルバーの枠(立体感)。太さは今と同じ3pxで、大きさは変わらない */
-body[data-frame="silver"] .stage .window,
-body[data-frame="silver"] .stage .choice {
-  border: 3px solid transparent;
-  border-image: linear-gradient(135deg, #ffffff 0%, #aab2c6 20%, #f3f6fc 42%, #7f889e 64%, #e6eaf4 84%, #b3bbcd 100%) 1;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .85), inset 0 0 7px rgba(60, 70, 105, .4), 3px 3px 0 var(--shadow);
-}
-body[data-frame="silver"] .stage .window { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .85), inset 0 0 9px rgba(60, 70, 105, .4), 4px 4px 0 var(--shadow); }
-
-/* B20: 背景の絵。画面に固定して、進行に合わせて切り替える。窓や選択肢は、2割透かす */
-#scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; transition: opacity .3s ease; }
-#scene.out { opacity: 0; }
-#scene svg { display: block; width: 100%; height: 100%; }
-body[data-scene="on"] .app { position: relative; z-index: 1; }
-body[data-scene="on"] .stage .window,
-body[data-scene="on"] .stage .choice,
-body[data-scene="on"] .stat,
-body[data-scene="on"] .clock,
-body[data-scene="on"] .snd,
-body[data-scene="on"] .top,
-body[data-scene="on"] .row3,
-body[data-scene="on"] .about,
-body[data-scene="on"] .guide-links,
-body[data-scene="on"] .foot {
-  background: color-mix(in srgb, var(--panel) 80%, transparent);
-}
-body[data-scene="on"] .clock,
-body[data-scene="on"] .top,
-body[data-scene="on"] .row3,
-body[data-scene="on"] .about,
-body[data-scene="on"] .guide-links,
-body[data-scene="on"] .foot { padding-left: 8px; padding-right: 8px; }
-body[data-scene="on"] .stage .choice:disabled { opacity: .8; }
-
-/* バッジのページの、特典の選択欄 */
-.perk { margin: 14px 0 0; padding: 10px 12px; border: 2px dashed var(--line); text-align: left; }
-.perk h3 { margin: 0 0 6px; font-size: 14px; font-weight: normal; color: var(--ink-soft); }
-.perk label { display: block; font-size: 15px; }
-.perk select { font: inherit; margin-left: 8px; padding: 4px 8px; color: var(--ink); background: var(--panel); border: 2px solid var(--ink); }
-.perk-note { margin: 6px 0 0; font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
