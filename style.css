@@ -563,7 +563,7 @@ body[data-frame="silver"] .stage .choice {
 body[data-frame="silver"] .stage .window { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .85), inset 0 0 9px rgba(60, 70, 105, .4), 4px 4px 0 var(--shadow); }
 
 /* B20: 背景の絵。画面に固定して、進行に合わせて切り替える。窓や選択肢は、2割透かす */
-#scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; transition: opacity .3s ease; }
+#scene { position: fixed; left: 0; bottom: 0; width: 100%; height: 100vh; height: 100lvh; transform: translateZ(0); z-index: 0; pointer-events: none; transition: opacity .3s ease; }
 #scene.out { opacity: 0; }
 #scene svg { display: block; width: 100%; height: 100%; }
 body[data-scene="on"] .app { position: relative; z-index: 1; }
