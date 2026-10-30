@@ -84,9 +84,8 @@ body {
 .pips li.done { background: var(--line); color: var(--ink); }
 .pips li.now { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
-.stage { display: flex; flex-direction: column; gap: 10px; min-height: 470px; --win-h: 190px; }   /* 画面が変わっても、ゲーム画面の外が動かないよう、高さを固定(足りない時はJSが広げる) */
-@media (max-width: 479px) { .stage { min-height: 490px; --win-h: 210px; } }
-@media (max-width: 340px) { .stage { min-height: 520px; --win-h: 240px; } }
+.stage { display: flex; flex-direction: column; gap: 10px; min-height: 437px; --win-h: 157px; }   /* 画面が変わっても、ゲーム画面の外が動かないよう、高さを固定(足りない時はJSが広げる)。窓は、文字4行分 */
+@media (max-width: 420px) { .stage { min-height: 430px; --win-h: 150px; } }
 
 .window {
   position: relative;
@@ -105,6 +104,8 @@ body:has(.app.game) { -webkit-user-select: none; user-select: none; -webkit-touc
 .stage .window { min-height: var(--win-h); }
 .plate { position: absolute; top: -15px; left: 12px; background: var(--ink); color: var(--bg); font-size: 14px; padding: 0 10px; line-height: 26px; }
 .line { margin: 0; font-size: 18px; line-height: 1.7; white-space: pre-line; text-wrap: pretty; }
+/* 文字が5行以上の時は、窓の大きさは4行分のまま、中の文字だけをスクロールする */
+.stage .window .line { max-height: 6.8em; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .more { position: absolute; right: 12px; bottom: 6px; font-size: 12px; color: var(--ink-soft); animation: blink 1s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
