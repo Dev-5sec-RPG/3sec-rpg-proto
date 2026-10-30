@@ -134,7 +134,7 @@ body {
 .txt { min-width: 0; overflow-wrap: anywhere; }
 .tap-hint { margin: auto 0 0; padding-top: 6px; text-align: center; font-size: 13px; color: var(--ink-soft); letter-spacing: .08em; }
 .stage.is-tap { cursor: pointer; }
-body:has(.stage.is-tap) { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+body:has(.stage.is-tap) { cursor: pointer; }
 
 .deltas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; min-height: 30px; }
 .chip { padding: 2px 12px; border: 2px solid currentColor; font-size: 15px; }
