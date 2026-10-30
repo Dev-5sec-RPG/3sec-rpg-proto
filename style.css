@@ -98,6 +98,8 @@ body {
 }
 .window.tappable { cursor: pointer; }
 /* ゲーム中は、連続でタップしても、文字が選択されて青くならないようにする */
+html, body { -webkit-tap-highlight-color: transparent; }
+body:has(.app.game) { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .app.game { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 .app.game ::selection { background: transparent; }
 .stage .window { min-height: var(--win-h); }
@@ -137,7 +139,7 @@ body {
 .txt { min-width: 0; overflow-wrap: anywhere; }
 .tap-hint { margin: auto 0 0; padding-top: 6px; text-align: center; font-size: 13px; color: var(--ink-soft); letter-spacing: .08em; }
 .stage.is-tap { cursor: pointer; }
-body:has(.stage.is-tap) { cursor: pointer; }
+@media (hover: hover) { body:has(.stage.is-tap) { cursor: pointer; } }      /* タッチ端末で、画面全体が「押せるもの」として青く光らないよう、マウスの時だけ */
 
 .deltas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; min-height: 30px; }
 .chip { padding: 2px 12px; border: 2px solid currentColor; font-size: 15px; }
