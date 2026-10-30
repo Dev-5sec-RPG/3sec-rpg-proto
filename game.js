@@ -345,12 +345,37 @@
     );
   }
 
+
+  /* --- 背景の絵(バッジ B20 の特典)。始まりの村 → 城下町 → 魔王城 --- */
+  const sceneEl = (function () {
+    if (C.skinValue('scene') !== 'on' || typeof SCENES === 'undefined') return null;
+    const d = document.createElement('div');
+    d.id = 'scene'; d.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(d, document.body.firstChild);
+    return d;
+  })();
+  let sceneName = null;
+  function setScene(name) {
+    if (!sceneEl || name === sceneName) return;
+    const first = sceneName === null;
+    sceneName = name;
+    if (first) { sceneEl.innerHTML = SCENES[name]; return; }
+    sceneEl.classList.add('out');
+    setTimeout(function () { sceneEl.innerHTML = SCENES[name]; sceneEl.classList.remove('out'); }, 300);
+  }
+  function sceneFor(card) {
+    if (card.id === 'road' || card.id === 'D' || card.sec === 'D') return 'castle';
+    if (card.id === 'town' || card.id === 'C' || card.sec === 'C') return 'town';
+    return 'village';
+  }
+
   /* --- 進行 --- */
   function nextCard() {
     run.i += 1;
     if (run.i >= run.queue.length) { leave('999'); return; }   // 通常は、イベントDで必ずエンドに着く
     const card = run.queue[run.i];
     G.encounter(run, card);
+    setScene(sceneFor(card));
     setPips(pipOf[run.i]);
     if (card.narr) { showNarration(card); return; }
     showIntro(card, 1);
@@ -402,6 +427,7 @@
     }, half);
   }
   function showStart() {
+    setScene('village');
     run = G.newRun();
     pipLabels = ['A'];
     setGear();
@@ -515,6 +541,7 @@
     const card = G.findCard(p.card);
     run.queue = [card]; run.i = 0; pipOf = [0];
     G.encounter(run, card);
+    setScene(sceneFor(card));
     showQuestion(card, p.stage || 1);
   }
 
