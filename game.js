@@ -70,6 +70,7 @@
     $('#gearW').textContent = w ? G.equipLabel(w) : '―';
     $('#gearA').textContent = a ? G.equipLabel(a) : '―';
     $('#gearF').textContent = run.allies.length ? run.allies.map(function (x) { return x.name; }).join('、') : '―';
+    fitGear();
   }
   function setPurse(money, delta) {
     const el = $('#purse');
@@ -120,6 +121,7 @@
   /* --- 選択画面(カウントダウン付き) --- */
   function showChoice(o) {
     phase = 'choice';
+    leaveTap();
     const order = o.labels.map(function (_, i) { return i; });
     if (o.shuffle) shuffle(order);
     stage.innerHTML =
@@ -129,6 +131,7 @@
       '<div class="choices">' + order.map(function (idx, n) {
         return '<button class="btn choice" data-i="' + idx + '"><span class="key">' + (n + 1) + '</span><span class="txt">' + o.labels[idx] + '</span></button>';
       }).join('') + '</div>';
+    fit();
     let done = false;
     readyAt = performance.now() + 150;            // 直前のタップの誤爆を防ぐ
     const buttons = stage.querySelectorAll('.choice');
@@ -161,21 +164,60 @@
     startTimer(expire);
   }
 
-  /* --- タップで進む画面 --- */
+  /* --- タップで進む画面 ---
+     画面のどこをタップしても進む(リンク・ボタン・「このゲームについて」を除く)。キーボードは Enter / Space でも進める */
+  let tapGo = null;
   function showTap(html, label, onNext) {
     phase = 'tap';
-    stage.innerHTML = html + '<button class="btn next" id="nextBtn">' + label + '</button>';
+    stage.classList.add('is-tap');
+    stage.innerHTML = html + '<p class="tap-hint" aria-hidden="true">' + tx('タップで次へ') + '</p>';
     readyAt = performance.now() + 180;
-    function go() {
+    fit();
+    tapGo = function () {
       if (cutLock || performance.now() < readyAt) return;     // カットイン中は、先へ進めない
+      tapGo = null;
       SFX.beep();
       onNext();
-    }
-    const btn = $('#nextBtn'), win = stage.querySelector('.window');
-    btn.addEventListener('click', go);
-    if (win) win.addEventListener('click', go);
-    btn.focus({ preventScroll: true });
+    };
   }
+  /* 画面の大きさは、これまでに出た中でいちばん大きいものに合わせる(増えるだけ。ゲーム画面の外が動かないように)
+     ・窓(会話の枠)の高さ  ・ゲーム画面全体の高さ */
+  let winMax = 0;
+  function fit() {
+    if (!winMax) winMax = parseFloat(getComputedStyle(stage).getPropertyValue('--win-h')) || 0;
+    const w = stage.querySelector('.window');
+    if (w) {
+      w.style.minHeight = '0';
+      const nh = w.offsetHeight;
+      w.style.minHeight = '';
+      if (nh > winMax) { winMax = nh; stage.style.setProperty('--win-h', winMax + 'px'); }
+    }
+    const h = stage.offsetHeight, m = parseFloat(stage.style.minHeight) || 0;
+    if (h > m) stage.style.minHeight = h + 'px';
+  }
+  /* 武器・防具・仲間の欄: 仲間が増えて2行以上になっても、あとで縮まない */
+  let gearMax = 0;
+  function fitGear() {
+    const r = document.querySelector('.row3');
+    if (!r) return;
+    const h = r.offsetHeight;
+    if (h > gearMax) { gearMax = h; r.style.minHeight = h + 'px'; }
+  }
+  function leaveTap() { tapGo = null; stage.classList.remove('is-tap'); }
+  const INTERACTIVE = 'a, button, summary, details, input, select, textarea, label';
+  document.addEventListener('click', function (ev) {
+    if (phase !== 'tap' || !tapGo) return;
+    if (ev.target.closest && ev.target.closest(INTERACTIVE)) return;
+    tapGo();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (phase !== 'tap' || !tapGo) return;
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    if (ev.target.closest && ev.target.closest(INTERACTIVE)) return;
+    ev.preventDefault();
+    tapGo();
+  });
 
   function showIntro(card, step) {
     const first = step === 1;

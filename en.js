@@ -466,6 +466,7 @@ const EN_DICT = {
  "全てのエンドを、集めきった証。\nこの旅の全てを、見届けた。": "Proof that you have collected every ending.\nYou have witnessed all there is to this journey.",
  "あれ、あそこにいるのは…": "Huh, who's that over there...",
  "{w}だ。何か用があるみたいだ。": "It's {w}. They seem to want something.",
+ "タップで次へ": "Tap to continue",
  "次へ": "Next",
  "{w}({n}回目)": "{w} (#{n})",
  "(時間切れ)": "(Time up)",

@@ -84,7 +84,9 @@ body {
 .pips li.done { background: var(--line); color: var(--ink); }
 .pips li.now { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
-.stage { display: flex; flex-direction: column; gap: 10px; }
+.stage { display: flex; flex-direction: column; gap: 10px; min-height: 470px; --win-h: 190px; }   /* 画面が変わっても、ゲーム画面の外が動かないよう、高さを固定(足りない時はJSが広げる) */
+@media (max-width: 479px) { .stage { min-height: 490px; --win-h: 210px; } }
+@media (max-width: 340px) { .stage { min-height: 520px; --win-h: 240px; } }
 
 .window {
   position: relative;
@@ -95,6 +97,7 @@ body {
   min-height: 96px;
 }
 .window.tappable { cursor: pointer; }
+.stage .window { min-height: var(--win-h); }
 .plate { position: absolute; top: -15px; left: 12px; background: var(--ink); color: var(--bg); font-size: 14px; padding: 0 10px; line-height: 26px; }
 .line { margin: 0; font-size: 18px; line-height: 1.7; white-space: pre-line; text-wrap: pretty; }
 .more { position: absolute; right: 12px; bottom: 6px; font-size: 12px; color: var(--ink-soft); animation: blink 1s steps(2) infinite; }
@@ -129,7 +132,9 @@ body {
 .choice { justify-content: flex-start; text-align: left; min-height: 48px; font-size: 17px; }
 .key { flex: none; width: 26px; height: 26px; display: grid; place-items: center; background: var(--ink); color: var(--bg); font-size: 14px; }
 .txt { min-width: 0; overflow-wrap: anywhere; }
-.next { align-self: center; min-width: 160px; }
+.tap-hint { margin: auto 0 0; padding-top: 6px; text-align: center; font-size: 13px; color: var(--ink-soft); letter-spacing: .08em; }
+.stage.is-tap { cursor: pointer; }
+body:has(.stage.is-tap) { cursor: pointer; }
 
 .deltas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; min-height: 30px; }
 .chip { padding: 2px 12px; border: 2px solid currentColor; font-size: 15px; }
@@ -225,10 +230,10 @@ body.hit-fail .app { animation: shake .56s linear; }
 .purse.down b { color: var(--bad); }
 @media (prefers-reduced-motion: reduce) { .purse.up, .purse.down { animation: none; } }
 
-.row3 { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.gear { display: flex; gap: 12px; align-items: center; font-size: 11px; line-height: 1.3; color: var(--ink-soft); min-width: 0; }
+.row3 { min-height: 60px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.gear { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: center; font-size: 11px; line-height: 1.3; color: var(--ink-soft); min-width: 0; }
 .g-eq { display: flex; flex-direction: column; flex: none; }
-.g-ally { min-width: 0; overflow-wrap: anywhere; }
+.g-ally { flex: 1 1 100%; min-width: 0; overflow-wrap: anywhere; }
 .gear b { font-weight: normal; color: var(--ink); }
 .purse { font-size: 13px; }
 .purse b { font-size: 19px; }
