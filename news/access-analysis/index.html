@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>アクセス解析で、遊ばれ方を確認してみた｜3秒即断RPG</title>
+<meta name="description" content="個人で作ったゲームを公開すると、「誰が、どこから、どのように遊んでいるのか」が気になります。">
+<link rel="canonical" href="https://3sec-rpg.com/news/access-analysis/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="アクセス解析で、遊ばれ方を確認してみた">
+<meta property="og:description" content="個人で作ったゲームを公開すると、「誰が、どこから、どのように遊んでいるのか」が気になります。">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://3sec-rpg.com/img/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"アクセス解析で、遊ばれ方を確認してみた","datePublished":"2026-11-09","inLanguage":"ja","mainEntityOfPage":"https://3sec-rpg.com/news/access-analysis/"}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-50ZVKWN1C8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-50ZVKWN1C8');
+</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6922416629136954"
+     crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>html{background:#e8ebf6}@media (prefers-color-scheme:dark){html{background:#0e1124}}</style>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<main class="app" data-root="../../">
+  <header class="top"><a class="brand-link" href="../../index.html"><h1 class="brand">3秒即断RPG</h1></a><a class="collect" href="../../index.html">遊ぶ</a></header>
+  <article class="doc">
+    <h2>アクセス解析で、遊ばれ方を確認してみた</h2>
+    <div class="post-meta"><span class="tag tag-blog">ブログ</span><time datetime="2026-11-09">2026年11月9日</time><span class="new" data-date="2026-11-09" hidden>NEW</span></div>
+<p>個人で作ったゲームを公開すると、「誰が、どこから、どのように遊んでいるのか」が気になります。この記事では、「3秒即断RPG」で、Googleアナリティクス(GA4)を使って、遊ばれ方を確認した内容と、見方のポイントをまとめます。</p>
+<h3>アクセス解析を入れた理由</h3>
+<p>ゲームは、作って公開しただけでは、遊ばれ方が分かりません。どの程度の人が来ているのか、どこから来たのか、どのページがよく見られているのかを知ることで、次に何を直すかの手がかりになります。</p>
+<p>なお、解析で得られるのは、国や端末、参照元などの統計です。個人を特定することは、できません。</p>
+<h3>最初に見る3つの項目</h3>
+<ol>
+<li>**ユーザー数:**一定の期間に、サイトを訪れた人の数です。</li>
+<li>**参照元:**どこから来たか(Xなどのリンク、検索、直接の入力など)を示します。</li>
+<li>**ページごとの表示回数:**どのページが、よく見られているかを示します。</li>
+</ol>
+<h3>参照元の見方</h3>
+<p>参照元は、「どこの宣伝が、効いているか」を知るために、特に役立ちます。主な表示の意味は、次のとおりです。</p>
+<ul>
+<li>「t.co」:Xからの流入です。Xのリンクは、すべて、t.coを経由するためです。</li>
+<li>「threads.net」:Threadsからの流入です。</li>
+<li>「google / organic」:Googleの検索からの流入です。</li>
+<li>「(direct)」:アドレスの直接入力や、ブックマーク、参照元が取れないアプリからの流入です。</li>
+</ul>
+<p>スマートフォンのアプリでも、レポートの画面から、流入元の一覧を確認できます。見つからない場合は、スマートフォンのブラウザで、パソコン用の表示に切り替えると、パソコンと同じ画面で確認できます。</p>
+<h3>実際に見えたこと</h3>
+<p>あるプレイヤーが、20分近く続けて遊び、約80ページを表示していました。流入元は、Xからでした。1ページあたり15秒ほどの計算になり、「1回のプレイが数分で終わる」というゲームの設計と、整合する動きです。1人が、何度も繰り返して遊んでくれたことが、読み取れました。</p>
+<h3>解析を見る時の注意点</h3>
+<ul>
+<li>**自分のアクセスを除く:**動作確認で、自分が遊んだ回数も、数字に含まれます。自分の端末は、除外する設定が望ましいです。</li>
+<li>**数字が少ないうちは、1人の動きで変わる:**少ないアクセスでは、1人の行動で、平均が大きく動きます。</li>
+<li>**個人を特定しない:**得られる情報は、統計です。特定の人を、探そうとはしないようにします。</li>
+</ul>
+<h3>解析を、改善にどう使うか</h3>
+<ul>
+<li>Xからの流入が多ければ、投稿の内容や頻度を、見直す材料になる。</li>
+<li>記事ページから、ゲームに入る人が多ければ、記事を増やす意味がある。</li>
+<li>英語圏からの流入があれば、英語版に力を入れる理由になる。</li>
+</ul>
+<h3>まとめ</h3>
+<p>アクセス解析は、難しい設定をしなくても、基本の3項目を見るだけで、手がかりが得られます。小さなゲームでも、数字を見ながら、少しずつ改善していくと、公開後の作業に、見通しが立ちます。</p>
+    <p><a class="back" href="../index.html">← お知らせ・ブログ一覧へ</a></p>
+  </article>
+  <footer class="foot"><nav><a href="../../news/index.html">お知らせ・ブログ</a><a href="../../privacy/index.html">プライバシーポリシー</a><a href="../../contact/index.html">お問い合わせ</a><a class="lang-sw" href="../../en/index.html" hreflang="en" lang="en">English</a></nav><small>© 2026 3秒即断RPG</small></footer>
+</main>
+<script>(function(){try{var n=document.querySelectorAll(".new[data-date]");var t=Date.now();for(var i=0;i<n.length;i++){var d=new Date(n[i].getAttribute("data-date")+"T00:00:00+09:00").getTime();var k=Math.floor((t-d)/86400000);if(k>=0&&k<7)n[i].hidden=false;}}catch(e){}})();</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>生成AIで、ブラウザゲームを作るための準備と進め方｜3秒即断RPG</title>
+<meta name="description" content="「3秒即断RPG」は、プログラミングの経験がない私が、生成AIのClaudeと対話しながら作りました。この記事では、制作を進めるうえで有効だったと感じる進め方を、準備・依頼の出し方・確認の方法に分けてまとめます。">
+<link rel="canonical" href="https://3sec-rpg.com/news/ai-game-workflow/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="生成AIで、ブラウザゲームを作るための準備と進め方">
+<meta property="og:description" content="「3秒即断RPG」は、プログラミングの経験がない私が、生成AIのClaudeと対話しながら作りました。この記事では、制作を進めるうえで有効だったと感じる進め方を、準備・依頼の出し方・確認の方法に分けてまとめます。">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://3sec-rpg.com/img/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"生成AIで、ブラウザゲームを作るための準備と進め方","datePublished":"2026-11-05","inLanguage":"ja","mainEntityOfPage":"https://3sec-rpg.com/news/ai-game-workflow/"}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-50ZVKWN1C8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-50ZVKWN1C8');
+</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6922416629136954"
+     crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>html{background:#e8ebf6}@media (prefers-color-scheme:dark){html{background:#0e1124}}</style>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<main class="app" data-root="../../">
+  <header class="top"><a class="brand-link" href="../../index.html"><h1 class="brand">3秒即断RPG</h1></a><a class="collect" href="../../index.html">遊ぶ</a></header>
+  <article class="doc">
+    <h2>生成AIで、ブラウザゲームを作るための準備と進め方</h2>
+    <div class="post-meta"><span class="tag tag-blog">ブログ</span><time datetime="2026-11-05">2026年11月5日</time><span class="new" data-date="2026-11-05" hidden>NEW</span></div>
+<p>「3秒即断RPG」は、プログラミングの経験がない私が、生成AIのClaudeと対話しながら作りました。この記事では、制作を進めるうえで有効だったと感じる進め方を、準備・依頼の出し方・確認の方法に分けてまとめます。同じように、生成AIでゲームを作ってみたい方の、参考になれば幸いです。</p>
+<h3>準備:作るものを、先に言葉にする</h3>
+<p>最初に、作りたいものを、短い文章にしておくと、あとの作業が楽になります。「3秒即断RPG」では、次の点を先に決めました。</p>
+<ul>
+<li>遊びの核:3秒以内に選択肢を選び続ける。</li>
+<li>遊ぶ時間:1回のプレイは、数分で終わる。</li>
+<li>終わり方:旅は、さまざまなエンド(結末)で終わる。</li>
+<li>動かす場所:登録やダウンロードが要らない、ブラウザの中。</li>
+</ul>
+<p>全体のイメージが決まっていると、AIに頼む内容も、ぶれにくくなります。細かい仕様は、あとから足せます。</p>
+<h3>進め方:小さく頼んで、遊んで確かめる</h3>
+<p>1回の依頼で、変える内容を絞ることを、心がけました。たくさんのことを一度に頼むと、どこで不具合が出たのか、分からなくなるためです。</p>
+<p>依頼を出して、受け取ったデータを自分で遊び、気になる点を、次の依頼に書く。この繰り返しです。不具合を伝える時は、次の3点を書くと、AIが原因を絞りやすくなります。</p>
+<ol>
+<li>何をしたか(どの画面で、何を押したか)</li>
+<li>どうなったか(実際の表示や動き)</li>
+<li>どうなってほしいか</li>
+</ol>
+<p>画面のスクリーンショットを添えると、文章では伝わりにくい表示の崩れも、正確に伝わります。</p>
+<h3>作業の記録を、ファイルに残す</h3>
+<p>AIとの会話が長くなると、前の内容が、あいまいになることがあります。そこで、仕様や直した内容を、メモのファイルに書き残してもらっています。新しい依頼の前に、そのメモを読み直してもらえば、前の決定を踏まえた作業を、続けられます。</p>
+<h3>AIに任せる範囲と、人が決める範囲</h3>
+<ul>
+<li>AIに任せる:コードを書く、文章のたたき台を出す、数値を集計する、試験を自動で行う。</li>
+<li>人が決める:何を面白いと感じるか、文章の雰囲気、公開してよいかどうか、表現の細かい調整。</li>
+</ul>
+<p>ゲームの面白さは、最終的には、遊んだ人の感覚で決まります。AIの提案を、そのまま使うのではなく、自分で遊んで、納得できるかを、確かめるようにしています。</p>
+<h3>つまずきやすい点</h3>
+<ul>
+<li>**実機での確認:**AIの作業環境では、スマートフォンでの実際の表示を確かめられません。表示や音、操作感は、自分の端末で確認します。</li>
+<li>**情報の食い違い:**画面の文章と、内部の数値が、ずれていることがあります。気になる点は、質問して、確認します。</li>
+<li>**会話の長さ:**やり取りが長くなったら、要点をまとめて、新しい会話に引き継ぐと、安定します。</li>
+</ul>
+<h3>公開の前に確認すること</h3>
+<ul>
+<li>スマートフォンとパソコンの、両方で遊べるか。</li>
+<li>英語版などの、別の言語の表示が崩れていないか。</li>
+<li>記録の保存や、音の切り替えが、正しく動くか。</li>
+<li>プライバシーや問い合わせの案内など、公開に必要なページがあるか。</li>
+</ul>
+<h3>まとめ</h3>
+<p>生成AIでのゲーム制作は、「先に言葉にする」「小さく頼む」「自分で遊んで確かめる」の3つで、進めやすくなります。専門的な知識がなくても、遊んだ感想を、具体的に伝えられれば、形にしていけます。</p>
+    <p><a class="back" href="../index.html">← お知らせ・ブログ一覧へ</a></p>
+  </article>
+  <footer class="foot"><nav><a href="../../news/index.html">お知らせ・ブログ</a><a href="../../privacy/index.html">プライバシーポリシー</a><a href="../../contact/index.html">お問い合わせ</a><a class="lang-sw" href="../../en/index.html" hreflang="en" lang="en">English</a></nav><small>© 2026 3秒即断RPG</small></footer>
+</main>
+<script>(function(){try{var n=document.querySelectorAll(".new[data-date]");var t=Date.now();for(var i=0;i<n.length;i++){var d=new Date(n[i].getAttribute("data-date")+"T00:00:00+09:00").getTime();var k=Math.floor((t-d)/86400000);if(k>=0&&k<7)n[i].hidden=false;}}catch(e){}})();</script>
+</body>
+</html>

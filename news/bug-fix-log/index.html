@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>個人開発のゲームで、不具合を見つけて直した記録｜3秒即断RPG</title>
+<meta name="description" content="個人で作ったゲームでは、公開したあとにも、不具合が見つかります。この記事では、「3秒即断RPG」で実際に起きた不具合と、その原因・直し方を、専門用語をできるだけ使わずに紹介します。">
+<link rel="canonical" href="https://3sec-rpg.com/news/bug-fix-log/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="個人開発のゲームで、不具合を見つけて直した記録">
+<meta property="og:description" content="個人で作ったゲームでは、公開したあとにも、不具合が見つかります。この記事では、「3秒即断RPG」で実際に起きた不具合と、その原因・直し方を、専門用語をできるだけ使わずに紹介します。">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://3sec-rpg.com/img/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"個人開発のゲームで、不具合を見つけて直した記録","datePublished":"2026-11-08","inLanguage":"ja","mainEntityOfPage":"https://3sec-rpg.com/news/bug-fix-log/"}</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-50ZVKWN1C8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-50ZVKWN1C8');
+</script>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6922416629136954"
+     crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>html{background:#e8ebf6}@media (prefers-color-scheme:dark){html{background:#0e1124}}</style>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<main class="app" data-root="../../">
+  <header class="top"><a class="brand-link" href="../../index.html"><h1 class="brand">3秒即断RPG</h1></a><a class="collect" href="../../index.html">遊ぶ</a></header>
+  <article class="doc">
+    <h2>個人開発のゲームで、不具合を見つけて直した記録</h2>
+    <div class="post-meta"><span class="tag tag-blog">ブログ</span><time datetime="2026-11-08">2026年11月8日</time><span class="new" data-date="2026-11-08" hidden>NEW</span></div>
+<p>個人で作ったゲームでは、公開したあとにも、不具合が見つかります。この記事では、「3秒即断RPG」で実際に起きた不具合と、その原因・直し方を、専門用語をできるだけ使わずに紹介します。同じように、ブラウザゲームを作っている方の、参考になれば幸いです。</p>
+<h3>直した不具合の一覧</h3>
+<table>
+<tr><th>症状</th><th>原因</th><th>直し方</th></tr>
+<tr><td>画面をタップすると、全体が青くなる</td><td>スマートフォンが、タップした部分を強調する表示と、文字の選択状態が、重なって出ていた</td><td>強調の色を透明にして、ゲーム画面の文字の選択を無効にした</td></tr>
+<tr><td>背景を変えると、上部の表示が読みにくい</td><td>文字の後ろの帯が、背景と重なり、見えにくくなっていた</td><td>帯を透明にして、文字に縁取りを付けた。窓と選択肢だけは、半透明にした</td></tr>
+<tr><td>背景が、スクロールに合わせて動いてから、元に戻る</td><td>スマートフォンのアドレスバーが伸び縮みして、画面の高さが変わっていた</td><td>背景を画面の下に固定して、高さを「最大の画面の高さ」で指定した</td></tr>
+<tr><td>窓が大きすぎる</td><td>窓の高さを、長い文章に合わせて、多めに確保していた</td><td>表示を4行までにして、超えた分は、窓の中でスクロールするようにした</td></tr>
+<tr><td>装備と仲間の表示が、折り返して縦に伸びた</td><td>横に並べる指定が、崩れていた</td><td>横3列に戻し、折り返しを禁止した</td></tr>
+<tr><td>良い結果なのに、悪い音が鳴る</td><td>音の種類を、ステータスの増減で決めていたため、増減のない突破が、悪い音になっていた</td><td>突破した場面は、良い音になるように、判定を追加した</td></tr>
+<tr><td>BGMに、雑音が混ざる</td><td>計測すると、音量を自動で整える処理が、音量を大きく揺らしていた</td><td>その処理を外し、雑音の立ち上がりを、なだらかにした</td></tr>
+</table>
+<h3>タップで画面が青くなる不具合</h3>
+<p>一番、直すのに手間がかかった不具合です。スマートフォンで、ゲームの画面をタップすると、全体が青く染まってしまう現象でした。最初は、文字の選択を防ぐ設定を入れましたが、直りませんでした。</p>
+<p>2回目に、タップした時の強調表示の色を、画面全体で透明にして、カーソルの形を変える設定を、マウスのある環境だけに限定したところ、解消しました。原因が1つとは限らない、という学びになりました。</p>
+<h3>背景と文字の見やすさ</h3>
+<p>背景の絵を選べる機能を付けた時に、画面の上部の文字が、読みにくくなりました。背景の色や絵に、文字が埋もれてしまったためです。</p>
+<p>文字の後ろの帯をなくして、文字そのものに、縁取りを付けました。縁取りは、背景の明るさに合わせて、色を変えています。ただし、縁取りが強すぎると、エンド画面や図鑑で、目立ちすぎました。そのため、ゲームの本編だけに、適用を絞りました。</p>
+<h3>音の不具合の探し方</h3>
+<p>音は、画面と違って、見ただけでは、問題が分かりません。そこで、ゲームの音を書き出して、音量の変化や、割れを、数値で調べました。その結果、音量を自動で整える処理が、原因の1つだと分かりました。数値で原因を絞れたことは、大きな収穫でした。</p>
+<h3>不具合を見つけるコツ</h3>
+<ul>
+<li>**実機で遊ぶ:**パソコンでは起きず、スマートフォンでだけ起きる不具合が、多くあります。</li>
+<li>**症状を、具体的に記録する:**どの画面で、何を押したら、どうなったかを、メモしておきます。</li>
+<li>**スクリーンショットを残す:**表示の崩れは、文章より、画像の方が正確に伝わります。</li>
+<li>**直したあとも、もう一度確かめる:**1つ直すと、別の場所が崩れることがあります。実際に、背景の対応では、装備の表示が崩れ、直し直しました。</li>
+</ul>
+<h3>まとめ</h3>
+<p>不具合は、公開後にも、必ず出ます。出たら、症状を正確に記録して、原因を1つずつ絞り込んでいく。この繰り返しが、ゲームの質を、少しずつ上げていくと感じています。</p>
+    <p><a class="back" href="../index.html">← お知らせ・ブログ一覧へ</a></p>
+  </article>
+  <footer class="foot"><nav><a href="../../news/index.html">お知らせ・ブログ</a><a href="../../privacy/index.html">プライバシーポリシー</a><a href="../../contact/index.html">お問い合わせ</a><a class="lang-sw" href="../../en/index.html" hreflang="en" lang="en">English</a></nav><small>© 2026 3秒即断RPG</small></footer>
+</main>
+<script>(function(){try{var n=document.querySelectorAll(".new[data-date]");var t=Date.now();for(var i=0;i<n.length;i++){var d=new Date(n[i].getAttribute("data-date")+"T00:00:00+09:00").getTime();var k=Math.floor((t-d)/86400000);if(k>=0&&k<7)n[i].hidden=false;}}catch(e){}})();</script>
+</body>
+</html>
